@@ -1,0 +1,15 @@
+{
+  "date": "2026-06-14",
+  "font_stack": "Geist + Geist Mono via next/font",
+  "palette": "Tailwind v4 + shadcn OKLCH variables; Ghost Palette grayscale OKLCH tokens",
+  "motion": "motion-cut; no framer-motion, motion, gsap, or lottie dependency detected",
+  "spacing": "Tailwind utilities; Hallmark 4pt tokens added",
+  "framework": "Next.js 16.2.9 App Router",
+  "preserve": [
+    "Geist next/font setup",
+    "Nunito Sans Black wordmark font",
+    "Tailwind v4 imports",
+    "shadcn OKLCH variable bridge",
+    "App Router file structure"
+  ]
+}

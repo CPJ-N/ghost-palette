@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ghost Palette
+
+Ghost Palette is an open-source image generation comparison app.
+
+The app gives users one prompt box, a model selector, local provider-key setup,
+and a side-by-side output grid so they can compare which image model handled the
+same prompt best.
+
+## MVP
+
+- Prompt input
+- Multi-model selector
+- Local API key fields for supported providers
+- Generate a comparison grid across selected models
+- Save favorite outputs
+- Basic local generation history
+- Account sign-in via Clerk (custom-themed); no billing, database, or evaluation layer yet
+
+## Current State
+
+This repository currently implements the frontend MVP:
+
+- A grayscale landing page with the Ghost Palette workbench below the hero
+- Nunito Sans Black wordmark styling
+- Provider key storage in `localStorage`
+- Favorites and history stored in `localStorage`
+- Deterministic placeholder image cards for the comparison flow
+- Custom-themed Clerk auth (Google + email/password) at `/sign-in` and `/sign-up`
+
+Provider API adapters are not wired yet. The generation UI is ready for real
+provider calls, but the current output cards are local placeholders.
+
+## Tech Stack
+
+- Next.js 16 App Router
+- React 19
+- Tailwind CSS v4
+- shadcn-style CSS variables
+- Clerk authentication (custom-themed sign-in / sign-up)
+- Lucide icons
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies, then start the local dev server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm dev
+pnpm lint
+pnpm build
+pnpm start
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `app/page.tsx` - main landing page and comparison workbench
+- `app/globals.css` - global styles and Ghost Palette page styling
+- `tokens.css` - portable design tokens for colors, type, spacing, and motion
+- `.hallmark/` - Hallmark design preflight and project memory
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Provider Roadmap
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The next implementation step is to replace the placeholder generation path with
+provider adapters. Each adapter should accept the shared prompt and return a
+normalised result shape for the comparison grid.
 
-## Deploy on Vercel
+Initial providers in the UI:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- OpenAI Images
+- Imagen
+- Flux Pro
+- SD Large
+- Ideogram
