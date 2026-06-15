@@ -1,37 +1,39 @@
-/* Hallmark · tokens: Ghost Palette · theme: Midnight grayscale · paper-band: dark · display-style: geometric-sans · accent-hue: neutral */
+/* Hallmark · tokens: Ghost Palette · theme: Monochrome (Paper light / Carbon dark) · default: dark · display-style: geometric-sans · accent-hue: neutral (zero chroma) */
+/* Strictly black/white/grey. The only color on screen is the generated images. */
 :root {
-  --color-paper: oklch(13% 0.005 260);
-  --color-paper-2: oklch(17% 0.005 260);
-  --color-paper-3: oklch(22% 0.005 260);
-  --color-paper-4: oklch(28% 0.005 260);
-  --color-ink: oklch(95% 0.005 260);
-  --color-ink-2: oklch(86% 0.005 260);
-  --color-muted: oklch(70% 0.005 260);
-  --color-neutral: oklch(58% 0.005 260);
-  --color-rule: oklch(31% 0.005 260);
-  --color-rule-2: oklch(40% 0.005 260);
-  --color-accent: oklch(82% 0.006 260);
-  --color-accent-2: oklch(68% 0.005 260);
-  --color-accent-ink: oklch(13% 0.005 260);
-  --color-focus: oklch(88% 0.006 260);
-  --color-danger: oklch(70% 0.005 260);
-  --color-success: oklch(76% 0.005 260);
-  --color-bloom: oklch(72% 0.005 260 / 10%);
-  --color-bloom-2: oklch(90% 0.005 260 / 6%);
-  --color-backdrop: oklch(8% 0.005 260 / 72%);
-  --color-shadow: oklch(6% 0.005 260 / 48%);
-  --color-art-openai-a: oklch(72% 0.005 260);
-  --color-art-openai-b: oklch(30% 0.005 260);
-  --color-art-google-a: oklch(76% 0.005 260);
-  --color-art-google-b: oklch(34% 0.005 260);
-  --color-art-bfl-a: oklch(68% 0.005 260);
-  --color-art-bfl-b: oklch(27% 0.005 260);
-  --color-art-stability-a: oklch(64% 0.005 260);
-  --color-art-stability-b: oklch(25% 0.005 260);
-  --color-art-ideogram-a: oklch(80% 0.005 260);
-  --color-art-ideogram-b: oklch(36% 0.005 260);
-  --color-art-spec: oklch(96% 0.004 260);
-  --color-sheen: oklch(98% 0.004 260 / 12%);
+  /* Paper — light theme (default :root) */
+  --color-paper: #fafafa;
+  --color-paper-2: #ffffff;
+  --color-paper-3: #f5f5f5;
+  --color-paper-4: #ececec;
+  --color-ink: #171717;
+  --color-ink-2: #404040;
+  --color-muted: #737373;
+  --color-neutral: #a3a3a3;
+  --color-rule: #e5e5e5;
+  --color-rule-2: #d4d4d4;
+  --color-accent: #171717;
+  --color-accent-2: #404040;
+  --color-accent-ink: #fafafa;
+  --color-focus: #171717;
+  --color-danger: #737373;
+  --color-success: #525252;
+  --color-bloom: rgba(23, 23, 23, 0.05);
+  --color-bloom-2: rgba(23, 23, 23, 0.03);
+  --color-backdrop: rgba(10, 10, 10, 0.4);
+  --color-shadow: rgba(10, 10, 10, 0.12);
+  --color-art-openai-a: #d4d4d4;
+  --color-art-openai-b: #a3a3a3;
+  --color-art-google-a: #d9d9d9;
+  --color-art-google-b: #a8a8a8;
+  --color-art-bfl-a: #cfcfcf;
+  --color-art-bfl-b: #9c9c9c;
+  --color-art-stability-a: #c7c7c7;
+  --color-art-stability-b: #969696;
+  --color-art-ideogram-a: #dedede;
+  --color-art-ideogram-b: #adadad;
+  --color-art-spec: #ffffff;
+  --color-sheen: rgba(23, 23, 23, 0.05);
   --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
@@ -78,4 +80,40 @@
   --z-toast: 500;
   --z-tooltip: 600;
   --page-gutter: clamp(1rem, 4vw, 2.5rem);
+}
+
+.dark {
+  /* Carbon — dark theme (default app mode) */
+  --color-paper: #000000;
+  --color-paper-2: #0c0c0c;
+  --color-paper-3: #161616;
+  --color-paper-4: #1c1c1c;
+  --color-ink: #ffffff;
+  --color-ink-2: #d4d4d4;
+  --color-muted: #b5b5b5;
+  --color-neutral: #8f8f8f;
+  --color-rule: #333333;
+  --color-rule-2: #404040;
+  --color-accent: #ffffff;
+  --color-accent-2: #d4d4d4;
+  --color-accent-ink: #000000;
+  --color-focus: #ffffff;
+  --color-danger: #b5b5b5;
+  --color-success: #d4d4d4;
+  --color-bloom: rgba(255, 255, 255, 0.06);
+  --color-bloom-2: rgba(255, 255, 255, 0.04);
+  --color-backdrop: rgba(0, 0, 0, 0.72);
+  --color-shadow: rgba(0, 0, 0, 0.6);
+  --color-art-openai-a: #3a3a3a;
+  --color-art-openai-b: #141414;
+  --color-art-google-a: #404040;
+  --color-art-google-b: #161616;
+  --color-art-bfl-a: #363636;
+  --color-art-bfl-b: #121212;
+  --color-art-stability-a: #303030;
+  --color-art-stability-b: #101010;
+  --color-art-ideogram-a: #454545;
+  --color-art-ideogram-b: #181818;
+  --color-art-spec: #ffffff;
+  --color-sheen: rgba(255, 255, 255, 0.1);
 }
