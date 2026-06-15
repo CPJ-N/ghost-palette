@@ -5,6 +5,13 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { AuthBackdrop } from "@/components/auth-backdrop";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+
 type Mode = "sign-in" | "sign-up";
 
 function GoogleGlyph() {
@@ -29,6 +36,15 @@ function readClerkError(error: unknown): string {
     e?.errors?.[0]?.message ??
     e?.message ??
     "Something went wrong. Please try again."
+  );
+}
+
+function Divider() {
+  return (
+    <div className="relative my-1 text-center">
+      <Separator className="absolute inset-0 top-1/2" />
+      <span className="relative bg-card px-2 text-xs text-muted-foreground">or</span>
+    </div>
   );
 }
 
@@ -142,141 +158,146 @@ export function AuthForm({ mode }: { mode: Mode }) {
   }
 
   return (
-    <main className="gp-auth">
-      <div className="gp-auth__card">
-        <a href="/" className="gp-auth__brand">
-          <span className="gp-mark" aria-hidden="true">
-            GP
-          </span>
-          <span>Ghost Palette</span>
-        </a>
-
-        {pendingVerification ? (
-          <>
-            <div className="gp-auth__head">
-              <h1>Check your email</h1>
-              <p>
-                Enter the 6-digit code we sent to <strong>{email}</strong>.
-              </p>
-            </div>
-            <form className="gp-auth__form" onSubmit={handleVerify}>
-              <div className="gp-auth__field">
-                <label htmlFor="code">Verification code</label>
-                <input
-                  id="code"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  value={code}
-                  onChange={(event) => setCode(event.target.value)}
-                  placeholder="123456"
-                  required
-                />
-              </div>
-              {error ? (
-                <p className="gp-auth__error" role="alert">
-                  {error}
-                </p>
-              ) : null}
-              <button
-                className="gp-button gp-button--primary gp-auth__submit"
-                type="submit"
-                disabled={submitting}
-                aria-busy={submitting}
-              >
-                {submitting ? (
-                  <Loader2 className="gp-spin" size={18} aria-hidden="true" />
-                ) : null}
-                Verify email
-              </button>
-            </form>
-          </>
-        ) : (
-          <>
-            <div className="gp-auth__head">
-              <h1>{isSignUp ? "Create your account" : "Welcome back"}</h1>
-              <p>
-                {isSignUp
-                  ? "Save favorites and runs across your devices."
-                  : "Sign in to your Ghost Palette account."}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              className="gp-button gp-button--ghost gp-auth__oauth"
-              onClick={handleGoogle}
-              disabled={submitting}
+    <main className="relative isolate grid min-h-svh place-items-center overflow-hidden bg-background px-4 py-10">
+      <AuthBackdrop />
+      <Card className="relative z-10 w-full max-w-sm shadow-2xl">
+        <CardContent className="space-y-5">
+          <div className="flex flex-col items-center gap-3 text-center">
+            <a
+              href="/"
+              className="inline-flex items-center gap-2 font-semibold tracking-tight"
             >
-              <GoogleGlyph />
-              Continue with Google
-            </button>
-
-            <div className="gp-auth__divider">
-              <span>or</span>
-            </div>
-
-            <form className="gp-auth__form" onSubmit={handleSubmit}>
-              <div className="gp-auth__field">
-                <label htmlFor="email">Email</label>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="you@studio.com"
-                  required
-                />
-              </div>
-              <div className="gp-auth__field">
-                <label htmlFor="password">Password</label>
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete={isSignUp ? "new-password" : "current-password"}
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="At least 8 characters"
-                  minLength={8}
-                  required
-                />
-              </div>
-              {error ? (
-                <p className="gp-auth__error" role="alert">
-                  {error}
-                </p>
-              ) : null}
-              {/* Clerk Smart CAPTCHA mounts here during sign-up (bot protection). */}
-              {isSignUp ? (
-                <div id="clerk-captcha" className="gp-auth__captcha" />
-              ) : null}
-              <button
-                className="gp-button gp-button--primary gp-auth__submit"
-                type="submit"
-                disabled={submitting}
-                aria-busy={submitting}
+              <span
+                aria-hidden="true"
+                className="grid size-8 place-items-center rounded-lg bg-primary text-xs font-bold text-primary-foreground"
               >
-                {submitting ? (
-                  <Loader2 className="gp-spin" size={18} aria-hidden="true" />
-                ) : null}
-                {isSignUp ? "Create account" : "Sign in"}
-              </button>
-            </form>
+                GP
+              </span>
+              Ghost Palette
+            </a>
+            <div className="space-y-1">
+              <h1 className="text-xl font-semibold tracking-tight">
+                {pendingVerification
+                  ? "Check your email"
+                  : isSignUp
+                    ? "Create your account"
+                    : "Welcome back"}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {pendingVerification ? (
+                  <>
+                    Enter the 6-digit code we sent to <strong>{email}</strong>.
+                  </>
+                ) : isSignUp ? (
+                  "Save favorites and runs across your devices."
+                ) : (
+                  "Sign in to your Ghost Palette account."
+                )}
+              </p>
+            </div>
+          </div>
 
-            <p className="gp-auth__alt">
-              {isSignUp ? (
-                <>
-                  Already have an account? <a href="/sign-in">Sign in</a>
-                </>
-              ) : (
-                <>
-                  New to Ghost Palette? <a href="/sign-up">Create one</a>
-                </>
-              )}
-            </p>
-          </>
-        )}
-      </div>
+          {pendingVerification ? (
+            <form onSubmit={handleVerify}>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="code">Verification code</FieldLabel>
+                  <Input
+                    id="code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={code}
+                    onChange={(event) => setCode(event.target.value)}
+                    placeholder="123456"
+                    required
+                  />
+                </Field>
+                {error ? <FieldError>{error}</FieldError> : null}
+                <Button type="submit" className="w-full" disabled={submitting} aria-busy={submitting}>
+                  {submitting ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}
+                  Verify email
+                </Button>
+              </FieldGroup>
+            </form>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={handleGoogle}
+                disabled={submitting}
+              >
+                <GoogleGlyph />
+                Continue with Google
+              </Button>
+
+              <Divider />
+
+              <form onSubmit={handleSubmit}>
+                <FieldGroup>
+                  <Field>
+                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                    <Input
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      placeholder="you@studio.com"
+                      required
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <Input
+                      id="password"
+                      type="password"
+                      autoComplete={isSignUp ? "new-password" : "current-password"}
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      placeholder="At least 8 characters"
+                      minLength={8}
+                      required
+                    />
+                  </Field>
+                  {error ? <FieldError>{error}</FieldError> : null}
+                  {/* Clerk Smart CAPTCHA mounts here during sign-up (bot protection). */}
+                  {isSignUp ? <div id="clerk-captcha" /> : null}
+                  <Button type="submit" className="w-full" disabled={submitting} aria-busy={submitting}>
+                    {submitting ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}
+                    {isSignUp ? "Create account" : "Sign in"}
+                  </Button>
+                </FieldGroup>
+              </form>
+
+              <p className="text-center text-sm text-muted-foreground">
+                {isSignUp ? (
+                  <>
+                    Already have an account?{" "}
+                    <a
+                      href="/sign-in"
+                      className="font-medium text-foreground underline underline-offset-4 hover:text-primary"
+                    >
+                      Sign in
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    New to Ghost Palette?{" "}
+                    <a
+                      href="/sign-up"
+                      className="font-medium text-foreground underline underline-offset-4 hover:text-primary"
+                    >
+                      Create one
+                    </a>
+                  </>
+                )}
+              </p>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </main>
   );
 }
