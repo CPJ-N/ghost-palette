@@ -47,7 +47,7 @@ create table if not exists results (
   prompt       text not null,
   seed         integer,
   status       text not null default 'complete',   -- queued | generating | complete | error
-  storage_path text,                               -- path in the Storage 'images' bucket
+  storage_path text,                               -- path in the Storage 'artifacts' bucket
   width        integer,
   height       integer,
   favorite     boolean not null default false,
@@ -83,5 +83,5 @@ create table if not exists eval_scores (
 );
 create index if not exists eval_scores_idx on eval_scores (eval_id, score desc);
 
--- After running this, create a Storage bucket named "images" (public) in the
--- Supabase dashboard for generated + reference images.
+-- Storage: a public bucket named "artifacts" holds generated + reference images
+-- (created via the service-role client; image/* only, 15 MB limit).
