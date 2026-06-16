@@ -11,8 +11,11 @@ const isProtected = createRouteMatcher([
   "/api/(.*)",
 ]);
 
+// Public API routes that must NOT require a Clerk session (Stripe can't carry one).
+const isPublicApi = createRouteMatcher(["/api/stripe/webhook"]);
+
 export default clerkMiddleware(async (auth, request) => {
-  if (isProtected(request)) {
+  if (isProtected(request) && !isPublicApi(request)) {
     await auth.protect();
   }
 });
