@@ -12,39 +12,41 @@ export function SiteFooter() {
             <span>Ghost Palette</span>
           </Link>
           <p>
-            Compare, generate, and evaluate across every leading image model —
-            in one workspace.
+            Compare, benchmark, and evaluate image models — live ImageBench
+            scores and industry reference data in one place.
           </p>
           <Link
             className="gp-button gp-button--ghost gp-sitefooter__cta"
-            href="/composer"
+            href="/leaderboard"
           >
-            Open the app
+            View live scores
           </Link>
         </div>
 
         <nav className="gp-sitefooter__cols" aria-label="Footer">
           <div>
-            <p>Product</p>
+            <p>Evaluate</p>
+            <Link href="/leaderboard">Live leaderboard</Link>
+            <Link href="/benchmark">Run suite</Link>
+            <Link href="/docs/benchmarks">Industry benchmarks</Link>
+            <Link href="/docs/methodology">Methodology</Link>
+          </div>
+          <div>
+            <p>Workbench</p>
             <Link href="/composer">Composer</Link>
             <Link href="/arena">Arena</Link>
             <Link href="/evals">Refine</Link>
-            <Link href="/pricing">Pricing</Link>
+            <Link href="/library">Library</Link>
           </div>
           <div>
             <p>Account</p>
             <Link href="/sign-in">Sign in</Link>
             <Link href="/sign-up">Create account</Link>
-          </div>
-          <div>
-            <p>Resources</p>
-            <Link href="/docs">Docs</Link>
-            <Link href="/docs/benchmarks">Benchmarks</Link>
-            <Link href="/leaderboard">Leaderboard</Link>
-            <Link href="/docs/methodology">Methodology</Link>
+            <Link href="/pricing">Pricing</Link>
           </div>
           <div>
             <p>Company</p>
+            <Link href="/docs">Docs</Link>
             <a href="mailto:hello@ghostpalette.app">Contact</a>
           </div>
         </nav>

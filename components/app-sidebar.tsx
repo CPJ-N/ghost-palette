@@ -53,6 +53,24 @@ const workflows = [
 
 const evaluation = [
   {
+    title: "Live leaderboard",
+    url: "/leaderboard",
+    icon: Trophy,
+    description: "ImageBench pass rates",
+  },
+  {
+    title: "Run suite",
+    url: "/benchmark",
+    icon: FlaskConical,
+    description: "ImageBench V1",
+  },
+  {
+    title: "Industry data",
+    url: "/docs/benchmarks",
+    icon: BookOpen,
+    description: "External rankings",
+  },
+  {
     title: "Library",
     url: "/library",
     icon: Library,
@@ -69,16 +87,6 @@ const support = [
     title: "Docs",
     url: "/docs",
     icon: BookOpen,
-  },
-  {
-    title: "Leaderboard",
-    url: "/leaderboard",
-    icon: Trophy,
-  },
-  {
-    title: "Suite",
-    url: "/benchmark",
-    icon: FlaskConical,
   },
   {
     title: "Pricing",
@@ -101,7 +109,7 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/composer" aria-label="Open Ghost Palette Composer">
+              <Link href="/leaderboard" aria-label="Ghost Palette evaluation">
                 <span className="gp-mark" aria-hidden="true">
                   GP
                 </span>
@@ -117,12 +125,16 @@ export function AppSidebar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain label="Workflows" items={workflows} />
-        <NavMain label="Evaluation" items={evaluation} />
+        <NavMain label="Benchmarks" items={evaluation.slice(0, 3)} />
+        <NavMain label="Workbench" items={workflows} />
+        <NavMain label="Workspace" items={evaluation.slice(3)} />
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
             <div className="gp-sidebar-note">
-              <p>Compare models, pick winners, then refine the strongest output.</p>
+              <p>
+                Run ImageBench on GP models, track live pass rates, and compare
+                against industry reference data.
+              </p>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>

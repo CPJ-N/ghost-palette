@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
+import { LiveLeaderboardBoard } from "@/components/live-leaderboard-board";
 import { MarketingNav } from "@/components/marketing-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { getPublicLeaderboard, getRecentSuiteRuns } from "@/lib/benchmark-store";
@@ -9,9 +11,9 @@ import { MODELS } from "@/lib/models";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Benchmark Leaderboard — Ghost Palette",
+  title: "Live Image Model Leaderboard — Ghost Palette",
   description:
-    "Public ImageBench V1 pass rates by model — VLM-graded results from the Ghost Palette community.",
+    "GP-reproduced ImageBench V1 pass rates — latest VLM-graded result per challenge from suite runs on Ghost Palette.",
 };
 
 function modelLabel(modelId: string) {
@@ -21,91 +23,78 @@ function modelLabel(modelId: string) {
 export default async function LeaderboardPage() {
   const [leaderboard, recentRuns] = await Promise.all([
     getPublicLeaderboard(),
-    getRecentSuiteRuns(10),
+    getRecentSuiteRuns(8),
   ]);
-
-  const gpModelIds = new Set(MODELS.map((m) => m.id));
 
   return (
     <main className="gp-shell">
       <MarketingNav />
 
-      <section className="gp-leaderboard">
-        <header className="gp-leaderboard__head">
-          <p className="gp-kicker">Public leaderboard</p>
-          <h1>ImageBench V1 pass rates</h1>
+      <section className="gp-eval">
+        <header className="gp-eval__head">
+          <p className="gp-kicker">Live scores</p>
+          <h1>Image model leaderboard</h1>
           <p>
-            Aggregated VLM pass/fail grades from suite runs on Ghost Palette.
-            Prompts from{" "}
+            Pass rates from the{" "}
             <a
-              href={IMAGEBENCH_ATTRIBUTION.repo}
+              href={IMAGEBENCH_ATTRIBUTION.url}
               target="_blank"
               rel="noopener noreferrer"
               className="gp-docs-inline-link"
             >
               {IMAGEBENCH_ATTRIBUTION.name}
-            </a>
+            </a>{" "}
+            suite — generated and VLM-graded on Ghost Palette. Reproduce any
+            score in the{" "}
+            <Link href="/benchmark" className="gp-docs-inline-link">
+              suite runner
+            </Link>
             .
           </p>
         </header>
 
-        {leaderboard.length === 0 ? (
-          <aside className="gp-docs-disclaimer" role="note">
-            <p>
-              No graded results yet.{" "}
-              <Link href="/benchmark">Run the benchmark suite</Link> to populate
-              the leaderboard. Ensure{" "}
-              <code>supabase/schema-benchmark.sql</code> is applied.
-            </p>
-          </aside>
-        ) : (
-          <div className="gp-docs-table-wrap">
-            <table className="gp-docs-table">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Model</th>
-                  <th scope="col">Pass rate</th>
-                  <th scope="col">Pass / Fail</th>
-                  <th scope="col">Graded</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leaderboard.map((row, index) => (
-                  <tr
-                    key={row.modelId}
-                    className={gpModelIds.has(row.modelId) ? "gp-docs-row--gp" : undefined}
-                  >
-                    <td className="gp-docs-table__rank">{index + 1}</td>
-                    <td className="gp-docs-table__model">{modelLabel(row.modelId)}</td>
-                    <td className="gp-docs-table__mono">{row.passRate.toFixed(1)}%</td>
-                    <td className="gp-docs-table__mono">
-                      {row.passCount} / {row.failCount}
-                    </td>
-                    <td className="gp-docs-table__mono">{row.total}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <LiveLeaderboardBoard rows={leaderboard} modelLabel={modelLabel} />
 
         {recentRuns.length > 0 ? (
-          <section className="gp-docs-section" aria-labelledby="recent-runs">
+          <section className="gp-eval__section" aria-labelledby="recent-runs">
             <h2 id="recent-runs">Recent suite runs</h2>
-            <ul className="gp-leaderboard-runs">
-              {recentRuns.map((run) => (
-                <li key={run.id}>
-                  <strong>{modelLabel(run.modelId)}</strong>
-                  <span>
-                    {run.passCount}/{run.passCount + run.failCount} pass
-                    {run.categoryFilter ? ` · ${run.categoryFilter}` : ""}
-                  </span>
-                </li>
-              ))}
+            <ul className="gp-eval__runs">
+              {recentRuns.map((run) => {
+                const total = run.passCount + run.failCount;
+                const pct = total > 0 ? (run.passCount / total) * 100 : 0;
+                return (
+                  <li key={run.id}>
+                    <strong>{modelLabel(run.modelId)}</strong>
+                    <span>
+                      {pct.toFixed(0)}% · {run.passCount}/{total} graded
+                      {run.totalChallenges !== total
+                        ? ` · ${run.totalChallenges} planned`
+                        : ""}
+                      {run.categoryFilter ? ` · ${run.categoryFilter}` : ""}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         ) : null}
+
+        <aside className="gp-eval__note" role="note">
+          <p>
+            <strong>GP live scores, not industry rankings.</strong> These pass
+            rates come from Ghost Palette runs using our fal adapters and VLM
+            grading. For Arena Elo, published ImageBench numbers, GenEval, and
+            price, see{" "}
+            <Link href="/docs/benchmarks" className="gp-docs-inline-link">
+              industry benchmarks
+            </Link>
+            .
+          </p>
+          <Link href="/docs/benchmarks" className="gp-docs-link">
+            Industry benchmarks
+            <ArrowUpRight size={14} aria-hidden="true" />
+          </Link>
+        </aside>
       </section>
 
       <SiteFooter />

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import {
@@ -11,7 +12,7 @@ import {
 
 const SORT_OPTIONS: { key: SortKey; label: string; asc?: boolean }[] = [
   { key: "arenaElo", label: "Arena Elo" },
-  { key: "imageBenchPassRate", label: "ImageBench pass %" },
+  { key: "imageBenchPassRate", label: "ImageBench (published)" },
   { key: "genevalOverall", label: "GenEval" },
   { key: "medianGenTimeSec", label: "Gen time", asc: true },
   { key: "pricePer1kImagesUsd", label: "Price / 1k", asc: true },
@@ -37,7 +38,8 @@ function formatCell(
   }
 }
 
-export function BenchmarkLeaderboard() {
+/** Sortable table of curated industry benchmark data (external sources). */
+export function IndustryBenchmarkTable() {
   const [gpOnly, setGpOnly] = useState(false);
   const [sortBy, setSortBy] = useState<SortKey>("arenaElo");
 
@@ -87,7 +89,7 @@ export function BenchmarkLeaderboard() {
               <th scope="col">Model</th>
               <th scope="col">Provider</th>
               <th scope="col">Arena Elo</th>
-              <th scope="col">ImageBench</th>
+              <th scope="col">ImageBench (pub.)</th>
               <th scope="col">GenEval</th>
               <th scope="col">Gen time</th>
               <th scope="col">$/1k imgs</th>
@@ -128,10 +130,14 @@ export function BenchmarkLeaderboard() {
       </div>
 
       <p className="gp-docs-table__note">
-        Data curated from public leaderboards as of {DATA_AS_OF}. Arena Elo from{" "}
-        {getSourceById("artificial-analysis")?.name}, pass rates from{" "}
-        {getSourceById("imagebench")?.name}, GenEval from published papers.
-        Ghost Palette does not run these benchmarks.
+        External reference data as of {DATA_AS_OF}. Arena Elo from{" "}
+        {getSourceById("artificial-analysis")?.name}, published ImageBench pass
+        rates from {getSourceById("imagebench")?.name}. Ghost Palette does not
+        reproduce these numbers — see the{" "}
+        <Link href="/leaderboard" className="gp-docs-inline-link">
+          live leaderboard
+        </Link>{" "}
+        for GP-reproduced scores.
       </p>
     </div>
   );

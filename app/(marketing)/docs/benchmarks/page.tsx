@@ -1,36 +1,42 @@
 import Link from "next/link";
 
+import { IndustryBenchmarkTable } from "@/components/industry-benchmark-table";
 import { BenchmarkGlossary } from "@/components/benchmark-glossary";
-import { BenchmarkLeaderboard } from "@/components/benchmark-leaderboard";
 import { DATA_AS_OF, INDUSTRY_MODELS } from "@/lib/benchmarks";
 
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Image Model Benchmarks 2026 — Ghost Palette Docs",
+  title: "Industry Image Model Benchmarks — Ghost Palette Docs",
   description:
-    "Compare top AI image generation models across Arena Elo, ImageBench pass rates, GenEval, speed, and price. Industry leaderboard with Ghost Palette models highlighted.",
+    "Curated external rankings: Arena Elo, published ImageBench pass rates, GenEval, speed, and price from public sources.",
 };
 
 export default function BenchmarksDocsPage() {
   return (
     <article className="gp-docs-page">
       <header className="gp-docs-page__hero">
-        <p className="gp-kicker">Benchmarks</p>
-        <h1>Image model benchmarks</h1>
+        <p className="gp-kicker">Industry reference</p>
+        <h1>External image model benchmarks</h1>
         <p className="gp-docs-page__lede">
-          A curated view of how leading text-to-image models perform across
-          human preference, automated task benchmarks, speed, and cost. Scores
-          are aggregated from published third-party leaderboards — Ghost Palette
-          does not run these benchmarks itself.
+          Curated cross-metric rankings from published third-party leaderboards
+          — human preference, automated suites, speed, and cost. Use this to
+          orient; use Ghost Palette&apos;s live scores to verify on our stack.
         </p>
       </header>
 
       <aside className="gp-docs-disclaimer" role="note">
         <p>
-          <strong>Data as of {DATA_AS_OF}.</strong> Rankings change as new models
-          ship and community votes accumulate. Use this page for orientation;
-          run your own comparisons in Composer for your specific use case.
+          <strong>External data only — not Ghost Palette scores.</strong> As of{" "}
+          {DATA_AS_OF}. For pass rates reproduced and graded on GP, see the{" "}
+          <Link href="/leaderboard" className="gp-docs-inline-link">
+            live leaderboard
+          </Link>
+          ; to run the suite yourself, open the{" "}
+          <Link href="/benchmark" className="gp-docs-inline-link">
+            suite runner
+          </Link>
+          .
         </p>
       </aside>
 
@@ -44,23 +50,28 @@ export default function BenchmarksDocsPage() {
       </section>
 
       <section className="gp-docs-section" aria-labelledby="leaderboard-title">
-        <h2 id="leaderboard-title">Industry leaderboard</h2>
+        <h2 id="leaderboard-title">Industry comparison table</h2>
         <p className="gp-docs-section__lede">
-          {INDUSTRY_MODELS.length} models compared across metrics where public data exists. Rows
-          marked in Ghost Palette are available in the app today.
+          {INDUSTRY_MODELS.length} models across metrics where public data
+          exists. Rows marked in Ghost Palette are available in the app today.
         </p>
-        <BenchmarkLeaderboard />
+        <IndustryBenchmarkTable />
       </section>
 
       <section className="gp-docs-cta">
-        <h2>See how models handle your prompts</h2>
+        <h2>Reproduce ImageBench on Ghost Palette</h2>
         <p>
-          Public benchmarks use fixed prompt suites. Your work needs your own
-          evaluation run.
+          Industry tables use published scores. Run the same ImageBench V1 suite
+          here to see how models perform on our generation + VLM pipeline.
         </p>
-        <Link className="gp-button gp-button--primary" href="/composer">
-          Open Composer
-        </Link>
+        <div className="gp-docs-cta__actions">
+          <Link className="gp-button gp-button--primary" href="/leaderboard">
+            Live leaderboard
+          </Link>
+          <Link className="gp-button gp-button--ghost" href="/benchmark">
+            Run suite
+          </Link>
+        </div>
       </section>
     </article>
   );

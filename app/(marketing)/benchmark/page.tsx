@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
-import { Check, Loader2, Trophy, X } from "lucide-react";
+import { Check, Loader2, Play, Trophy, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -26,10 +26,10 @@ type ChallengeResult = {
 };
 
 const PRESETS = [
-  { label: "Quick (3)", limit: 3 },
-  { label: "Category sample (5)", limit: 5 },
-  { label: "Full category", limit: 0 },
-  { label: "Full suite (192)", limit: 192 },
+  { label: "Quick", detail: "3 challenges", limit: 3 },
+  { label: "Sample", detail: "5 challenges", limit: 5 },
+  { label: "Full category", detail: "one category", limit: 0 },
+  { label: "Full suite", detail: "192 challenges", limit: 192 },
 ] as const;
 
 export default function BenchmarkPage() {
@@ -45,14 +45,16 @@ export default function BenchmarkPage() {
   const [suiteError, setSuiteError] = useState<string | null>(null);
 
   const preset = PRESETS[presetIdx];
+  const isFullSuite = preset.label === "Full suite";
+  const isFullCategory = preset.label === "Full category";
+
   const estimatedCount = useMemo(() => {
-    if (preset.label === "Full category") {
-      return CATEGORY_INFO[category as keyof typeof CATEGORY_INFO]
-        ? CATEGORY_INFO[category as keyof typeof CATEGORY_INFO].tests * 3
-        : 15;
+    if (isFullCategory) {
+      const info = CATEGORY_INFO[category as keyof typeof CATEGORY_INFO];
+      return info ? info.tests * 3 : 15;
     }
     return preset.limit;
-  }, [preset, category]);
+  }, [preset, category, isFullCategory]);
 
   async function runSuite() {
     if (!modelId || running) return;
@@ -66,13 +68,7 @@ export default function BenchmarkPage() {
     setResults([]);
     setSuiteError(null);
 
-    const isFullSuite = preset.label === "Full suite (192)";
-    const limit =
-      preset.label === "Full category"
-        ? undefined
-        : isFullSuite
-          ? 192
-          : preset.limit;
+    const limit = isFullCategory ? undefined : isFullSuite ? 192 : preset.limit;
 
     let suiteRunId: string;
     let challengeIds: string[];
@@ -148,24 +144,23 @@ export default function BenchmarkPage() {
     setRunning(false);
   }
 
-  const passRate =
-    results.length > 0
-      ? (
-          (results.filter((r) => r.passed === true).length / results.length) *
-          100
-        ).toFixed(1)
-      : null;
+  const graded = results.filter((r) => r.passed !== null).length;
+  const passes = results.filter((r) => r.passed === true).length;
+  const passRate = graded > 0 ? ((passes / graded) * 100).toFixed(1) : null;
+  const progressPct =
+    progress.total > 0 ? (progress.done / progress.total) * 100 : 0;
+  const needsAuth = isLoaded && !isSignedIn;
 
   return (
     <main className="gp-shell">
       <MarketingNav />
 
-      <div className="gp-feature">
-        <header className="gp-feature__head">
-          <span className="gp-tag">Benchmark</span>
-          <h1>ImageBench V1 suite</h1>
+      <section className="gp-eval">
+        <header className="gp-eval__head">
+          <p className="gp-kicker">Benchmark suite</p>
+          <h1>Run the ImageBench V1 suite</h1>
           <p>
-            Run the fixed 192-prompt evaluation suite from{" "}
+            Generate against a fixed 192-prompt suite from{" "}
             <a
               href={IMAGEBENCH_ATTRIBUTION.repo}
               target="_blank"
@@ -174,21 +169,41 @@ export default function BenchmarkPage() {
             >
               ImageBench
             </a>
-            . Generate, VLM-grade pass/fail, and contribute to the{" "}
-            <Link href="/leaderboard">public leaderboard</Link>.{" "}
-            {isLoaded && !isSignedIn ? (
+            , grade each output pass/fail with a VLM judge, and contribute to the{" "}
+            <Link href="/leaderboard" className="gp-docs-inline-link">
+              live leaderboard
+            </Link>
+            .
+            {needsAuth ? (
               <>
-                <Link href="/sign-in?redirect_url=/benchmark">Sign in</Link> to run
-                the suite — generation requires an account.
+                {" "}
+                <Link href="/sign-in?redirect_url=/benchmark" className="gp-docs-inline-link">
+                  Sign in
+                </Link>{" "}
+                to run — generation requires an account.
               </>
             ) : null}
           </p>
         </header>
 
-        <section className="gp-benchmark-controls">
-          <label>
-            Model
+        <div className="gp-eval__categories" aria-label="Suite categories">
+          {(Object.keys(CATEGORY_INFO) as (keyof typeof CATEGORY_INFO)[]).map(
+            (name) => (
+              <div key={name} className="gp-eval__cat">
+                <span className="gp-eval__cat-name">{name}</span>
+                <span className="gp-eval__cat-tests">
+                  {CATEGORY_INFO[name].tests} tests
+                </span>
+              </div>
+            ),
+          )}
+        </div>
+
+        <div className="gp-eval__runner">
+          <div className="gp-eval__field">
+            <label htmlFor="bm-model">Model</label>
             <select
+              id="bm-model"
               value={modelId}
               onChange={(e) => setModelId(e.target.value)}
               disabled={running}
@@ -199,41 +214,45 @@ export default function BenchmarkPage() {
                 </option>
               ))}
             </select>
-          </label>
-          <label>
-            Category
+          </div>
+
+          <div className="gp-eval__field">
+            <label htmlFor="bm-category">Category</label>
             <select
+              id="bm-category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              disabled={running || preset.label === "Full suite (192)"}
+              disabled={running || isFullSuite}
             >
               {categories.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
               ))}
-              {preset.label === "Full suite (192)" ? (
-                <option value="">All categories</option>
-              ) : null}
             </select>
-          </label>
-          <label>
-            Scope
-            <select
-              value={presetIdx}
-              onChange={(e) => setPresetIdx(Number(e.target.value))}
-              disabled={running}
-            >
+          </div>
+
+          <div className="gp-eval__field gp-eval__field--scope">
+            <label>Scope</label>
+            <div className="gp-eval__scopes" role="group" aria-label="Run scope">
               {PRESETS.map((p, i) => (
-                <option key={p.label} value={i}>
-                  {p.label}
-                </option>
+                <button
+                  key={p.label}
+                  type="button"
+                  className={`gp-eval__scope ${presetIdx === i ? "is-active" : ""}`}
+                  onClick={() => setPresetIdx(i)}
+                  disabled={running}
+                >
+                  <span>{p.label}</span>
+                  <span className="gp-eval__scope-detail">{p.detail}</span>
+                </button>
               ))}
-            </select>
-          </label>
+            </div>
+          </div>
+
           <button
             type="button"
-            className="gp-button gp-button--primary"
+            className="gp-button gp-button--primary gp-eval__run"
             disabled={running || !modelId}
             onClick={runSuite}
           >
@@ -242,64 +261,90 @@ export default function BenchmarkPage() {
                 <Loader2 size={16} className="gp-spin" aria-hidden="true" />
                 Running {progress.done}/{progress.total}
               </>
-            ) : isLoaded && !isSignedIn ? (
+            ) : needsAuth ? (
               <>Sign in to run</>
             ) : (
-              <>Run ~{estimatedCount} challenges</>
+              <>
+                <Play size={16} aria-hidden="true" />
+                Run ~{estimatedCount} challenges
+              </>
             )}
           </button>
-        </section>
+        </div>
 
-        {suiteError ? <p className="gp-settings-error">{suiteError}</p> : null}
+        {running ? (
+          <div className="gp-eval__progress" aria-live="polite">
+            <div className="gp-eval__progress-track">
+              <span
+                className="gp-eval__progress-fill"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <span className="gp-eval__progress-label">
+              {progress.done} of {progress.total} graded
+            </span>
+          </div>
+        ) : null}
+
+        {suiteError ? <p className="gp-eval__error">{suiteError}</p> : null}
 
         {passRate !== null && !running ? (
-          <p className="gp-benchmark-summary">
-            Session pass rate: <strong>{passRate}%</strong> ({results.length} graded)
+          <p className="gp-eval__summary">
+            Session pass rate: <strong>{passRate}%</strong> ({passes}/{graded}{" "}
+            passed)
             {" · "}
-            <Link href="/leaderboard">View public leaderboard</Link>
+            <Link href="/leaderboard" className="gp-docs-inline-link">
+              View live leaderboard
+            </Link>
           </p>
         ) : null}
 
         {results.length > 0 ? (
-          <div className="gp-benchmark-grid">
+          <div className="gp-eval__cards">
             {results.map((result) => (
-              <article key={result.challengeId} className="gp-benchmark-card">
-                <div className="gp-benchmark-card__head">
+              <article key={result.challengeId} className="gp-eval__card">
+                <div className="gp-eval__card-head">
                   <span>{result.challengeId}</span>
                   {result.passed === true ? (
-                    <span className="gp-benchmark-pass">
-                      <Check size={14} aria-hidden="true" /> PASS
+                    <span className="gp-eval__verdict is-pass">
+                      <Check size={13} aria-hidden="true" /> PASS
                     </span>
                   ) : result.passed === false ? (
-                    <span className="gp-benchmark-fail">
-                      <X size={14} aria-hidden="true" /> FAIL
+                    <span className="gp-eval__verdict is-fail">
+                      <X size={13} aria-hidden="true" /> FAIL
                     </span>
                   ) : (
-                    <span className="gp-benchmark-muted">—</span>
+                    <span className="gp-eval__verdict is-muted">—</span>
                   )}
                 </div>
                 {result.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={result.imageUrl} alt="" className="gp-benchmark-card__img" />
+                  <img src={result.imageUrl} alt="" className="gp-eval__card-img" />
                 ) : (
-                  <div className="gp-benchmark-card__err">{result.error ?? "No image"}</div>
+                  <div className="gp-eval__card-err">
+                    {result.error ?? "No image"}
+                  </div>
                 )}
-                <p className="gp-benchmark-card__prompt">
+                <p className="gp-eval__card-prompt">
                   {result.prompt || result.category}
                 </p>
               </article>
             ))}
           </div>
-        ) : (
-          <div className="gp-benchmark-empty">
-            <Trophy size={28} aria-hidden="true" />
+        ) : !running ? (
+          <div className="gp-eval__empty">
+            <Trophy size={30} aria-hidden="true" />
+            <h2>Pick a model and scope</h2>
             <p>
-              Pick a model and scope, then run the suite. Results feed the{" "}
-              <Link href="/leaderboard">public leaderboard</Link>.
+              Run the suite to grade outputs pass/fail. Results feed the{" "}
+              <Link href="/leaderboard" className="gp-docs-inline-link">
+                live leaderboard
+              </Link>
+              .
             </p>
           </div>
-        )}
-      </div>
+        ) : null}
+      </section>
 
       <SiteFooter />
     </main>

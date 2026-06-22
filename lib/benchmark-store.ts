@@ -28,13 +28,18 @@ function isBenignReadError(error: unknown) {
   );
 }
 
-export type LeaderboardRow = {
+export const MIN_LIVE_LEADERBOARD_GRADES = 3;
+
+export type LiveLeaderboardRow = {
   modelId: string;
   passCount: number;
   failCount: number;
   total: number;
   passRate: number;
 };
+
+/** @deprecated Use LiveLeaderboardRow */
+export type LeaderboardRow = LiveLeaderboardRow;
 
 export type BenchmarkSuiteRun = {
   id: string;
@@ -144,12 +149,13 @@ export async function finalizeSuiteRun(
   log.info("suite_run.finalized", { suiteRunId, passCount, failCount, status });
 }
 
-export async function getPublicLeaderboard(): Promise<LeaderboardRow[]> {
+export async function getPublicLeaderboard(): Promise<LiveLeaderboardRow[]> {
   const sb = supabaseAdmin();
   const { data, error } = await sb
     .from("benchmark_challenge_results")
-    .select("model_id, passed")
-    .not("passed", "is", null);
+    .select("model_id, challenge_id, passed, created_at")
+    .not("passed", "is", null)
+    .order("created_at", { ascending: false });
 
   if (error) {
     if (isBenignReadError(error)) {
@@ -163,12 +169,27 @@ export async function getPublicLeaderboard(): Promise<LeaderboardRow[]> {
     throw new Error(error.message);
   }
 
-  const byModel = new Map<string, { pass: number; fail: number }>();
+  // Latest grade per model + challenge (re-runs replace earlier scores).
+  const latestByChallenge = new Map<
+    string,
+    { modelId: string; passed: boolean }
+  >();
+
   for (const row of data ?? []) {
-    const cur = byModel.get(row.model_id) ?? { pass: 0, fail: 0 };
-    if (row.passed) cur.pass += 1;
+    const key = `${row.model_id}:${row.challenge_id}`;
+    if (latestByChallenge.has(key)) continue;
+    latestByChallenge.set(key, {
+      modelId: row.model_id,
+      passed: row.passed as boolean,
+    });
+  }
+
+  const byModel = new Map<string, { pass: number; fail: number }>();
+  for (const entry of latestByChallenge.values()) {
+    const cur = byModel.get(entry.modelId) ?? { pass: 0, fail: 0 };
+    if (entry.passed) cur.pass += 1;
     else cur.fail += 1;
-    byModel.set(row.model_id, cur);
+    byModel.set(entry.modelId, cur);
   }
 
   return [...byModel.entries()]
@@ -182,7 +203,7 @@ export async function getPublicLeaderboard(): Promise<LeaderboardRow[]> {
         passRate: total > 0 ? (counts.pass / total) * 100 : 0,
       };
     })
-    .filter((r) => r.total >= 1)
+    .filter((r) => r.total >= MIN_LIVE_LEADERBOARD_GRADES)
     .sort((a, b) => b.passRate - a.passRate || b.total - a.total);
 }
 

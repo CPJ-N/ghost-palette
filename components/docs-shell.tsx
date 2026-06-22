@@ -3,7 +3,12 @@
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, FlaskConical, LayoutGrid } from "lucide-react";
+import {
+  BookOpen,
+  FlaskConical,
+  LayoutGrid,
+  Trophy,
+} from "lucide-react";
 
 import {
   Breadcrumb,
@@ -18,11 +23,21 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
 } from "@/components/ui/sidebar";
+
+const LIVE_EVAL_NAV: {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+}[] = [
+  { title: "Live leaderboard", url: "/leaderboard", icon: Trophy },
+  { title: "Run suite", url: "/benchmark", icon: FlaskConical },
+];
 
 const DOCS_NAV: {
   title: string;
@@ -34,19 +49,19 @@ const DOCS_NAV: {
     title: "Overview",
     url: "/docs",
     icon: LayoutGrid,
-    description: "Documentation hub for Ghost Palette evaluation workflows.",
+    description: "Evaluation docs — live scores, industry data, methodology.",
   },
   {
-    title: "Benchmarks",
+    title: "Industry benchmarks",
     url: "/docs/benchmarks",
     icon: BookOpen,
-    description: "Industry leaderboards and benchmark glossary.",
+    description: "External rankings and benchmark glossary.",
   },
   {
     title: "Methodology",
     url: "/docs/methodology",
     icon: FlaskConical,
-    description: "How Ghost Palette runs fair model comparisons.",
+    description: "Fair comparison rules for Composer, Arena, and Refine.",
   },
 ];
 
@@ -77,12 +92,27 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="gp-docs">
       <SidebarProvider className="gp-docs__provider">
-        <Sidebar
-          collapsible="none"
-          className="gp-docs__nav hidden md:flex"
-        >
+        <Sidebar collapsible="none" className="gp-docs__nav hidden md:flex">
           <SidebarContent>
             <SidebarGroup>
+              <SidebarGroupLabel>Ghost Palette scores</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {LIVE_EVAL_NAV.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <Link href={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+            <SidebarGroup>
+              <SidebarGroupLabel>Documentation</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {DOCS_NAV.map((item) => {
@@ -109,6 +139,16 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
         <div className="gp-docs__main">
           <header className="gp-docs__head">
             <nav className="gp-docs__mobile" aria-label="Documentation sections">
+              {LIVE_EVAL_NAV.map((item) => (
+                <Link
+                  key={item.title}
+                  href={item.url}
+                  className="gp-docs__mobile-link"
+                >
+                  <item.icon size={15} aria-hidden="true" />
+                  {item.title}
+                </Link>
+              ))}
               {DOCS_NAV.map((item) => {
                 const active = isActive(pathname, item.url);
                 return (

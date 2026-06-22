@@ -7,10 +7,10 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV_LINKS = [
+  { href: "/leaderboard", label: "Live scores" },
+  { href: "/benchmark", label: "Run suite" },
+  { href: "/docs/benchmarks", label: "Industry" },
   { href: "/docs", label: "Docs" },
-  { href: "/docs/benchmarks", label: "Benchmarks" },
-  { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/benchmark", label: "Suite" },
   { href: "/pricing", label: "Pricing" },
 ] as const;
 
@@ -24,7 +24,10 @@ export function MarketingNav({ homeAnchors }: MarketingNavProps = {}) {
 
   function isActive(href: string) {
     if (href === "/docs") {
-      return pathname === "/docs" || pathname.startsWith("/docs/");
+      return pathname === "/docs";
+    }
+    if (href === "/docs/benchmarks") {
+      return pathname === "/docs/benchmarks" || pathname.startsWith("/docs/benchmarks/");
     }
     return pathname === href || pathname.startsWith(`${href}/`);
   }

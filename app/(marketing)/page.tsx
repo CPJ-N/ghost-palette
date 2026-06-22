@@ -49,12 +49,12 @@ export default function MarketingPage() {
               side by side, and keep the one worth shipping.
             </p>
 
-            <nav className="gp-hero-rail" aria-label="Product workflows">
-              <Link href="/composer">Composer</Link>
+            <nav className="gp-hero-rail" aria-label="Evaluation">
+              <Link href="/leaderboard">Live scores</Link>
               <span aria-hidden="true">·</span>
-              <Link href="/arena">Arena</Link>
+              <Link href="/benchmark">Run suite</Link>
               <span aria-hidden="true">·</span>
-              <Link href="/evals">Refine</Link>
+              <Link href="/docs/benchmarks">Industry</Link>
             </nav>
 
             <div className="gp-hero__actions">

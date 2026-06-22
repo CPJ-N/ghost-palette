@@ -1,6 +1,6 @@
 import { INDUSTRY_MODELS } from "./models";
 import { BENCHMARK_SOURCES } from "./sources";
-import type { IndustryModel, LeaderboardRow, SortKey } from "./types";
+import type { IndustryModel, IndustryLeaderboardRow, SortKey } from "./types";
 
 export { BENCHMARK_SOURCES } from "./sources";
 export { INDUSTRY_MODELS } from "./models";
@@ -8,6 +8,8 @@ export type {
   BenchmarkSource,
   BenchmarkSourceId,
   IndustryModel,
+  IndustryLeaderboardRow,
+  /** @deprecated Use IndustryLeaderboardRow */
   LeaderboardRow,
   SortKey,
   SourcedValue,
@@ -46,7 +48,7 @@ export function getLeaderboardRows(
     sortBy?: SortKey;
     sortAsc?: boolean;
   } = {},
-): LeaderboardRow[] {
+): IndustryLeaderboardRow[] {
   const { gpOnly = false, sortBy = "arenaElo", sortAsc = false } = options;
 
   const models = (

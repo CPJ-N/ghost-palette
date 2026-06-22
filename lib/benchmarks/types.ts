@@ -36,9 +36,12 @@ export type IndustryModel = {
   pricePer1kImagesUsd?: SourcedValue;
 };
 
-export type LeaderboardRow = IndustryModel & {
+export type IndustryLeaderboardRow = IndustryModel & {
   rank: number;
 };
+
+/** @deprecated Use IndustryLeaderboardRow */
+export type LeaderboardRow = IndustryLeaderboardRow;
 
 export type SortKey =
   | "arenaElo"
