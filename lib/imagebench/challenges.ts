@@ -46,7 +46,7 @@ export const CATEGORY_INFO: Record<
     tests: 19,
     description: "Counting, relative position, scale, compositionality",
   },
-  "Human Realism": {
+  "Human realism": {
     tests: 14,
     description: "Faces, expressions, hands, full-body coherence",
   },

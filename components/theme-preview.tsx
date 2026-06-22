@@ -18,7 +18,7 @@ const PLANS = [
     name: "Free",
     price: "$0",
     per: "",
-    features: ["50 credits / mo", "Composer & Arena", "All five models"],
+    features: ["50 credits / mo", "Image Arena", "All five models"],
     cta: "Get started",
     featured: false,
   },
@@ -34,7 +34,7 @@ const PLANS = [
     name: "Basic",
     price: "$20",
     per: "/mo",
-    features: ["1,000 credits / mo", "Composer, Arena & Evals", "All five models"],
+    features: ["1,000 credits / mo", "Arena & Refine", "All five models"],
     cta: "Choose Basic",
     featured: false,
   },
@@ -59,9 +59,8 @@ export function ThemePreview({ variant }: { variant: string }) {
             Ghost Palette
           </span>
           <nav className="ml-3 hidden gap-5 text-sm text-muted-foreground md:flex">
-            <span>Composer</span>
             <span>Arena</span>
-            <span className="font-medium text-foreground">Evals</span>
+            <span className="font-medium text-foreground">Refine</span>
             <span>Pricing</span>
           </nav>
           <div className="ml-auto flex items-center gap-2">

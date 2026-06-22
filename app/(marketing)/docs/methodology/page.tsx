@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Evaluation Methodology — Ghost Palette Docs",
   description:
-    "How Ghost Palette runs fair image model comparisons — Composer, Arena, and Refine workflows aligned with industry benchmark practices.",
+    "How Ghost Palette runs fair image model comparisons — Arena and Refine workflows aligned with industry benchmark practices.",
 };
 
 const FAIR_RUN_RULES = [
@@ -32,14 +32,9 @@ const FAIR_RUN_RULES = [
 
 const WORKFLOWS = [
   {
-    title: "Composer",
-    metric: "Bulk comparison",
-    body: "Run one prompt across every selected model in parallel. Best for surveying outputs and spotting style differences quickly.",
-  },
-  {
     title: "Arena",
     metric: "Human preference",
-    body: "Head-to-head judging on the same prompt. Mirrors Arena.ai and Artificial Analysis — the signal users actually trust for quality.",
+    body: "Run one prompt across every model, compare outputs side by side, and pick a winner — blind or named. Mirrors Arena.ai and Artificial Analysis.",
   },
   {
     title: "Refine",
@@ -137,10 +132,10 @@ export default function MethodologyDocsPage() {
 
       <section className="gp-docs-cta">
         <h2>Put methodology into practice</h2>
-        <p>Start with a fair comparison run across all five Ghost Palette models.</p>
+        <p>Start with a fair comparison run in the Image Arena.</p>
         <div className="gp-docs-cta__actions">
-          <Link className="gp-button gp-button--primary" href="/composer">
-            Open Composer
+          <Link className="gp-button gp-button--primary" href="/arena">
+            Open Arena
           </Link>
           <Link className="gp-button gp-button--ghost" href="/docs/benchmarks">
             View benchmarks

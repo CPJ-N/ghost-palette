@@ -11,14 +11,9 @@ import { sampleSrc, SHOWCASE_PROMPT } from "@/lib/samples";
 
 const FEATURES = [
   {
-    tag: "Composer",
-    title: "Bulk generation",
-    body: "One prompt across every model and seed you pick — a full comparison grid in a single run.",
-  },
-  {
     tag: "Arena",
     title: "Head-to-head",
-    body: "Pit models against each other on the same prompt, blind or named, and pick the winner.",
+    body: "Run one prompt across every model, compare outputs side by side, and pick the winner — blind or named.",
   },
   {
     tag: "Refine",
@@ -58,8 +53,8 @@ export default function MarketingPage() {
             </nav>
 
             <div className="gp-hero__actions">
-              <Link className="gp-button gp-button--primary" href="/composer">
-                Open the app
+              <Link className="gp-button gp-button--primary" href="/arena">
+                Open Arena
               </Link>
               <Link className="gp-button gp-button--ghost" href="/pricing">
                 See pricing
@@ -70,7 +65,7 @@ export default function MarketingPage() {
           <div className="gp-hero__stage" aria-label="Ghost Palette product preview">
             <div className="gp-hero-stage">
               <header className="gp-hero-stage__bar">
-                <span className="gp-hero-stage__label">Composer preview</span>
+                <span className="gp-hero-stage__label">Arena preview</span>
                 <span className="gp-hero-stage__status">
                   {MODELS.length} models · one prompt
                 </span>
@@ -127,8 +122,8 @@ export default function MarketingPage() {
 
       <section className="gp-features" id="features" aria-labelledby="features-title">
         <div className="gp-features__head">
-          <h2 id="features-title">Three ways to compare</h2>
-          <p>Composer, Arena, and Refine — one model roster, three workflows.</p>
+          <h2 id="features-title">Two ways to compare</h2>
+          <p>Arena and Refine — one model roster, focused workflows.</p>
         </div>
         <div className="gp-features__grid">
           {FEATURES.map((feature) => (
@@ -145,8 +140,8 @@ export default function MarketingPage() {
 
       <section className="gp-cta" aria-labelledby="cta-title">
         <h2 id="cta-title">Stop guessing which model to use.</h2>
-        <Link className="gp-button gp-button--primary" href="/composer">
-          Open the app
+        <Link className="gp-button gp-button--primary" href="/arena">
+          Open Arena
           <ArrowUpRight size={18} aria-hidden="true" />
         </Link>
       </section>

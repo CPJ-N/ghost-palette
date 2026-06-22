@@ -1,13 +1,12 @@
 "use client";
 
 import { useClerk, useUser } from "@clerk/nextjs";
-import { Images, Library, LogOut, Moon, Settings, Sun, Swords, Target } from "lucide-react";
+import { LogOut, Library, Moon, Settings, Sun, Swords, Target } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 
 const PRIMARY = [
-  { href: "/composer", label: "Composer", icon: Images },
   { href: "/arena", label: "Arena", icon: Swords },
   { href: "/evals", label: "Evals", icon: Target },
 ];

@@ -10,10 +10,11 @@ export type ImageBenchChallenge = {
   vlm: string;
 };
 
+/** Category labels match the upstream challenges.csv exactly. */
 export type ImageBenchCategory =
   | "Text Rendering"
   | "Spatial Reasoning"
-  | "Human Realism"
+  | "Human realism"
   | "Professional Studio"
   | "Graphical design"
   | "Truthfulness";

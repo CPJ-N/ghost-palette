@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   BookOpen,
   GalleryHorizontalEnd,
-  Images,
   Library,
   LifeBuoy,
   Settings,
@@ -32,16 +31,10 @@ import {
 
 const workflows = [
   {
-    title: "Composer",
-    url: "/composer",
-    icon: Images,
-    description: "Bulk generation",
-  },
-  {
     title: "Arena",
     url: "/arena",
     icon: Swords,
-    description: "Head-to-head judging",
+    description: "Compare models head-to-head",
   },
   {
     title: "Refine",

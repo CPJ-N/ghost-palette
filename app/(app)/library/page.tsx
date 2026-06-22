@@ -38,7 +38,7 @@ export default function LibraryPage() {
         <span className="gp-tag">Library</span>
         <h1>Saved evaluations</h1>
         <p>
-          Composer batches, arena winners, and refinement comparisons you save
+          Arena winners and refinement comparisons you save
           appear here. Runs stay in this browser until Supabase persistence
           ships.
         </p>
@@ -46,9 +46,8 @@ export default function LibraryPage() {
 
       {runs.length === 0 ? (
         <div className="gp-listempty">
-          Nothing saved yet. Generate in{" "}
-          <Link href="/composer">Composer</Link>, judge in{" "}
-          <Link href="/arena">Arena</Link>, or compare in{" "}
+          Nothing saved yet. Compare in{" "}
+          <Link href="/arena">Arena</Link> or{" "}
           <Link href="/evals">Refine</Link>, then use Save to Library.
         </div>
       ) : (

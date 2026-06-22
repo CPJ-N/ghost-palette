@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 // Routes here are gated by proxy.ts for generation workflows. The shadcn sidebar is
-// the workspace frame for Composer, Arena, Refine, Library, and Settings.
+// the workspace frame for Arena, Refine, Library, and Settings.
 export default function AppLayout({
   children,
 }: {

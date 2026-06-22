@@ -29,9 +29,15 @@ const SECTIONS = [
     external: false,
   },
   {
+    title: "ImageBench V1",
+    href: "/docs/imagebench",
+    body: "Published ImageBench methodology, 192-prompt suite structure, and official leaderboard.",
+    external: false,
+  },
+  {
     title: "Methodology",
     href: "/docs/methodology",
-    body: "How Ghost Palette runs fair comparisons across Composer, Arena, and Refine.",
+    body: "Fair comparison rules for Arena and Refine workflows.",
     external: false,
   },
 ];
@@ -66,11 +72,11 @@ export default function DocsIndexPage() {
       <section className="gp-docs-cta">
         <h2>Compare on your prompts</h2>
         <p>
-          Benchmarks answer fixed suites. Composer answers your brief — same
-          prompt across every model in one grid.
+          Benchmarks answer fixed suites. Arena answers your brief — same
+          prompt across every model in one comparison grid.
         </p>
-        <Link className="gp-button gp-button--primary" href="/composer">
-          Open Composer
+        <Link className="gp-button gp-button--primary" href="/arena">
+          Open Arena
         </Link>
       </section>
     </article>

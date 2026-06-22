@@ -58,10 +58,16 @@ const DOCS_NAV: {
     description: "External rankings and benchmark glossary.",
   },
   {
+    title: "ImageBench V1",
+    url: "/docs/imagebench",
+    icon: Trophy,
+    description: "Published ImageBench methodology and leaderboard reference.",
+  },
+  {
     title: "Methodology",
     url: "/docs/methodology",
     icon: FlaskConical,
-    description: "Fair comparison rules for Composer, Arena, and Refine.",
+    description: "Fair comparison rules for Arena and Refine workflows.",
   },
 ];
 

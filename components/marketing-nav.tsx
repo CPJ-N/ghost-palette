@@ -63,8 +63,8 @@ export function MarketingNav({ homeAnchors }: MarketingNavProps = {}) {
             Sign in
           </Link>
         ) : null}
-        <Link className="gp-button gp-button--primary" href="/composer">
-          Open the app
+        <Link className="gp-button gp-button--primary" href="/arena">
+          Open Arena
         </Link>
       </div>
     </header>

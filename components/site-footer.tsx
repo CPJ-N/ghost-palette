@@ -33,7 +33,6 @@ export function SiteFooter() {
           </div>
           <div>
             <p>Workbench</p>
-            <Link href="/composer">Composer</Link>
             <Link href="/arena">Arena</Link>
             <Link href="/evals">Refine</Link>
             <Link href="/library">Library</Link>

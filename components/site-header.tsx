@@ -9,13 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const ROUTES: Record<string, { title: string; description: string }> = {
-  "/composer": {
-    title: "Composer",
-    description: "One prompt, every model — floating prompt dock.",
-  },
   "/arena": {
     title: "Arena",
-    description: "Compare two or more model outputs and choose a winner.",
+    description: "Compare model outputs head-to-head and pick a winner.",
   },
   "/evals": {
     title: "Refine",
@@ -52,7 +48,7 @@ function currentRoute(pathname: string) {
     .sort((a, b) => b.length - a.length)
     .find((route) => pathname === route || pathname.startsWith(`${route}/`));
 
-  return match ? ROUTES[match] : ROUTES["/composer"];
+  return match ? ROUTES[match] : ROUTES["/arena"];
 }
 
 export function SiteHeader() {

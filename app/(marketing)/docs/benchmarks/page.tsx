@@ -61,11 +61,18 @@ export default function BenchmarksDocsPage() {
       <section className="gp-docs-cta">
         <h2>Reproduce ImageBench on Ghost Palette</h2>
         <p>
-          Industry tables use published scores. Run the same ImageBench V1 suite
-          here to see how models perform on our generation + VLM pipeline.
+          Industry tables use published scores. See the full ImageBench V1
+          reference — methodology, routing, and official leaderboard — on the{" "}
+          <Link href="/docs/imagebench" className="gp-docs-inline-link">
+            ImageBench docs
+          </Link>
+          , or run the same suite here to compare on our stack.
         </p>
         <div className="gp-docs-cta__actions">
-          <Link className="gp-button gp-button--primary" href="/leaderboard">
+          <Link className="gp-button gp-button--primary" href="/docs/imagebench">
+            ImageBench reference
+          </Link>
+          <Link className="gp-button gp-button--ghost" href="/leaderboard">
             Live leaderboard
           </Link>
           <Link className="gp-button gp-button--ghost" href="/benchmark">

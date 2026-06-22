@@ -84,7 +84,7 @@ export default function PricingPage() {
         <div className="gp-pricing__head">
           <h1 id="pricing-title">Credit-based pricing</h1>
           <p>
-            Every plan includes Composer, Arena, and Refine. Credits are spent per
+            Every plan includes Arena and Refine. Credits are spent per
             generation — pick the volume you need, scale anytime.
           </p>
           {error ? <p className="gp-pricing__error">{error}</p> : null}
@@ -119,13 +119,13 @@ export default function PricingPage() {
                 <Check size={16} aria-hidden="true" /> 50 credits / month
               </li>
               <li>
-                <Check size={16} aria-hidden="true" /> Composer &amp; Arena
+                <Check size={16} aria-hidden="true" /> Image Arena
               </li>
               <li>
                 <Check size={16} aria-hidden="true" /> All five models
               </li>
             </ul>
-            <Link className="gp-button gp-button--ghost gp-plan__cta" href="/composer">
+            <Link className="gp-button gp-button--ghost gp-plan__cta" href="/arena">
               Get started
             </Link>
           </article>
@@ -203,7 +203,7 @@ export default function PricingPage() {
             <p className="gp-plan__inherit">Everything in Basic, plus</p>
             <ul className="gp-plan__features">
               <li>
-                <Check size={16} aria-hidden="true" /> Bulk Composer batches
+                <Check size={16} aria-hidden="true" /> Multi-model arena runs
               </li>
               <li>
                 <Check size={16} aria-hidden="true" /> Faster generation

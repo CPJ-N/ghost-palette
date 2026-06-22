@@ -1,0 +1,207 @@
+{
+  "source": "https://imagebench.ai/imagebench-v1",
+  "suiteVersion": "imagebench-v1",
+  "syncedAt": "2026-06-22",
+  "modelCount": 22,
+  "challengeCount": 192,
+  "models": [
+    {
+      "rank": 1,
+      "slug": "fal--google--nano-banana-2",
+      "name": "fal/google/nano-banana-2",
+      "passRate": 95.3,
+      "passCount": 183,
+      "failCount": 9,
+      "medianLatencySec": 28.1
+    },
+    {
+      "rank": 2,
+      "slug": "openai--gpt-image-2",
+      "name": "openai/gpt-image-2",
+      "passRate": 95.3,
+      "passCount": 183,
+      "failCount": 9,
+      "medianLatencySec": 45.3
+    },
+    {
+      "rank": 3,
+      "slug": "fal--google--nano-banana-pro",
+      "name": "fal/google/nano-banana-pro",
+      "passRate": 92.2,
+      "passCount": 177,
+      "failCount": 15,
+      "medianLatencySec": 23.4
+    },
+    {
+      "rank": 4,
+      "slug": "bfl--flux-2-max",
+      "name": "bfl/flux-2-max",
+      "passRate": 91.1,
+      "passCount": 175,
+      "failCount": 17,
+      "medianLatencySec": 26.7
+    },
+    {
+      "rank": 5,
+      "slug": "fal--bytedance--seedream-v4",
+      "name": "fal/bytedance/seedream-v4",
+      "passRate": 84.4,
+      "passCount": 162,
+      "failCount": 30,
+      "medianLatencySec": 14.1
+    },
+    {
+      "rank": 6,
+      "slug": "bfl--flux-2-pro",
+      "name": "bfl/flux-2-pro",
+      "passRate": 83.9,
+      "passCount": 161,
+      "failCount": 31,
+      "medianLatencySec": 11.8
+    },
+    {
+      "rank": 7,
+      "slug": "fal--ideogram--v4",
+      "name": "fal/ideogram/v4",
+      "passRate": 82.8,
+      "passCount": 159,
+      "failCount": 33,
+      "medianLatencySec": 16.6
+    },
+    {
+      "rank": 8,
+      "slug": "fal--krea--v2-large",
+      "name": "fal/krea/v2-large",
+      "passRate": 81.2,
+      "passCount": 156,
+      "failCount": 36,
+      "medianLatencySec": 30.1
+    },
+    {
+      "rank": 9,
+      "slug": "fal--krea--v2-medium",
+      "name": "fal/krea/v2-medium",
+      "passRate": 80.2,
+      "passCount": 154,
+      "failCount": 38,
+      "medianLatencySec": 18.5
+    },
+    {
+      "rank": 10,
+      "slug": "fal--krea--v2-medium-turbo",
+      "name": "fal/krea/v2-medium-turbo",
+      "passRate": 79.7,
+      "passCount": 153,
+      "failCount": 39,
+      "medianLatencySec": 15.5
+    },
+    {
+      "rank": 11,
+      "slug": "bfl--flux-2-klein-9b",
+      "name": "bfl/flux-2-klein-9b",
+      "passRate": 78.6,
+      "passCount": 151,
+      "failCount": 41,
+      "medianLatencySec": 4.1
+    },
+    {
+      "rank": 12,
+      "slug": "local--z-image-6b",
+      "name": "local/z-image-6b",
+      "passRate": 76,
+      "passCount": 146,
+      "failCount": 46,
+      "medianLatencySec": 130.7
+    },
+    {
+      "rank": 13,
+      "slug": "local--z-image-turbo-6b",
+      "name": "local/z-image-turbo-6b",
+      "passRate": 74,
+      "passCount": 142,
+      "failCount": 50,
+      "medianLatencySec": 18.1
+    },
+    {
+      "rank": 14,
+      "slug": "bfl--flux-2-klein-4b",
+      "name": "bfl/flux-2-klein-4b",
+      "passRate": 73.4,
+      "passCount": 141,
+      "failCount": 51,
+      "medianLatencySec": 3.8
+    },
+    {
+      "rank": 15,
+      "slug": "fal--bria--fast",
+      "name": "fal/bria/fast",
+      "passRate": 71.9,
+      "passCount": 138,
+      "failCount": 54,
+      "medianLatencySec": 12.4
+    },
+    {
+      "rank": 16,
+      "slug": "local--qwen-image-2512-20b",
+      "name": "local/qwen-image-2512-20b",
+      "passRate": 70.3,
+      "passCount": 135,
+      "failCount": 57,
+      "medianLatencySec": 80.2
+    },
+    {
+      "rank": 17,
+      "slug": "local--bonsai-image-ternary-4b",
+      "name": "local/bonsai-image-ternary-4b",
+      "passRate": 69.3,
+      "passCount": 133,
+      "failCount": 59,
+      "medianLatencySec": 4.1
+    },
+    {
+      "rank": 18,
+      "slug": "fal--ideogram--v3",
+      "name": "fal/ideogram/v3",
+      "passRate": 67.7,
+      "passCount": 130,
+      "failCount": 62,
+      "medianLatencySec": 12.9
+    },
+    {
+      "rank": 19,
+      "slug": "local--nucleus-image-17b-a2b",
+      "name": "local/nucleus-image-17b-a2b",
+      "passRate": 65.6,
+      "passCount": 126,
+      "failCount": 66,
+      "medianLatencySec": 39.1
+    },
+    {
+      "rank": 20,
+      "slug": "local--prxpixel-t2i-7b",
+      "name": "local/prxpixel-t2i-7b",
+      "passRate": 65.1,
+      "passCount": 125,
+      "failCount": 67,
+      "medianLatencySec": 64.7
+    },
+    {
+      "rank": 21,
+      "slug": "local--hidream-i1-full-17b",
+      "name": "local/hidream-i1-full-17b",
+      "passRate": 57.8,
+      "passCount": 111,
+      "failCount": 81,
+      "medianLatencySec": 91.3
+    },
+    {
+      "rank": 22,
+      "slug": "local--sana-1.5-1.6b",
+      "name": "local/sana-1.5-1.6b",
+      "passRate": 52.1,
+      "passCount": 100,
+      "failCount": 92,
+      "medianLatencySec": 11.1
+    }
+  ]
+}

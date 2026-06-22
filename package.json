@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sync:imagebench": "node scripts/sync-imagebench-challenges.mjs && node scripts/sync-imagebench-leaderboard.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.5.2",
