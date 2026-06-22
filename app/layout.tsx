@@ -2,6 +2,7 @@ import {ClerkProvider} from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,7 +45,9 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <ClerkProvider>{children}</ClerkProvider>
+          <ClerkProvider>
+            <TooltipProvider delayDuration={800}>{children}</TooltipProvider>
+          </ClerkProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,5 +1,15 @@
 [
   {
+    "date": "2026-06-22",
+    "macrostructure": "Workbench",
+    "theme": "Ember Workbench",
+    "enrichment": "none",
+    "brief": "Ghost Palette single-sidebar model evaluation workspace for Composer, Arena, and Refinement",
+    "genre": "atmospheric",
+    "nav": "shadcn sidebar / N3 side rail",
+    "footer": "Ft2 Inline single line"
+  },
+  {
     "date": "2026-06-14",
     "macrostructure": "Split Studio",
     "theme": "Midnight grayscale",

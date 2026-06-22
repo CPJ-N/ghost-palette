@@ -1,12 +1,11 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
+import { MarketingNav } from "@/components/marketing-nav";
 import { SampleMasonry } from "@/components/sample-masonry";
 import { SiteFooter } from "@/components/site-footer";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { MODELS } from "@/lib/models";
 import { sampleSrc, SHOWCASE_PROMPT } from "@/lib/samples";
 
@@ -22,80 +21,86 @@ const FEATURES = [
     body: "Pit models against each other on the same prompt, blind or named, and pick the winner.",
   },
   {
-    tag: "Evals",
-    title: "Reference comparison",
-    body: "Upload or choose a target image, then score how close every other model gets — side by side.",
+    tag: "Refine",
+    title: "Editing and refinement",
+    body: "Use a reference direction, ask every model for the same refinement, and evaluate which one gets closest.",
   },
 ];
 
 export default function MarketingPage() {
-  const { isLoaded, isSignedIn } = useUser();
-
   return (
     <main className="gp-shell">
-      <header className="gp-topnav" aria-label="Primary navigation">
-        <Link href="/" className="gp-nav__brand">
-          <span className="gp-mark" aria-hidden="true">
-            GP
-          </span>
-          <span>Ghost Palette</span>
-        </Link>
-        <div className="gp-topnav__right">
-          <nav className="gp-topnav__links" aria-label="Page sections">
-            <a href="#how">How it works</a>
-            <a href="#features">Features</a>
-            <Link href="/pricing">Pricing</Link>
-          </nav>
-          <ThemeToggle />
-          {isLoaded && !isSignedIn ? (
-            <Link className="gp-button gp-button--ghost" href="/sign-in">
-              Sign in
-            </Link>
-          ) : null}
-          <Link className="gp-button gp-button--primary" href="/composer">
-            Open the app
-          </Link>
-        </div>
-      </header>
+      <MarketingNav
+        homeAnchors={[
+          { href: "#how", label: "How it works" },
+          { href: "#features", label: "Features" },
+        ]}
+      />
 
-      <section className="gp-hero" aria-labelledby="hero-title">
-        <div className="gp-hero__copy">
-          <p className="gp-kicker">The image-model workspace</p>
-          <h1 id="hero-title">Find the model that gets it right.</h1>
-          <p>
-            Run one prompt through every leading image model, inspect the outputs
-            side by side, and keep the one worth shipping.
-          </p>
-          <div className="gp-hero__actions">
-            <Link className="gp-button gp-button--primary" href="/composer">
-              Open the app
-            </Link>
-            <Link className="gp-button gp-button--ghost" href="/pricing">
-              See pricing
-            </Link>
+      <section className="gp-hero-band" aria-labelledby="hero-title">
+        <div className="gp-hero-band__grid" aria-hidden="true" />
+
+        <div className="gp-hero">
+          <div className="gp-hero__copy">
+            <p className="gp-kicker">The image-model workspace</p>
+            <h1 id="hero-title">Find the model that gets it right.</h1>
+            <p className="gp-hero__lede">
+              Run one prompt through every leading image model, inspect the outputs
+              side by side, and keep the one worth shipping.
+            </p>
+
+            <nav className="gp-hero-rail" aria-label="Product workflows">
+              <Link href="/composer">Composer</Link>
+              <span aria-hidden="true">·</span>
+              <Link href="/arena">Arena</Link>
+              <span aria-hidden="true">·</span>
+              <Link href="/evals">Refine</Link>
+            </nav>
+
+            <div className="gp-hero__actions">
+              <Link className="gp-button gp-button--primary" href="/composer">
+                Open the app
+              </Link>
+              <Link className="gp-button gp-button--ghost" href="/pricing">
+                See pricing
+              </Link>
+            </div>
           </div>
-        </div>
-        <div className="gp-hero__preview" aria-label="Ghost Palette product preview">
-          <div className="gp-preview__bar">
-            <span>same prompt</span>
-            <span>{MODELS.length} models</span>
-          </div>
-          <div className="gp-preview__prompt">{SHOWCASE_PROMPT}</div>
-          <div className="gp-preview__grid">
-            {MODELS.slice(0, 4).map((model) => {
-              const src = sampleSrc("showcase", model.id);
-              return (
-                <span
-                  className={`gp-preview__tile ${model.artClass}`}
-                  key={model.id}
-                >
-                  {src ? (
-                    <img className="gp-art__img" src={src} alt="" loading="lazy" />
-                  ) : null}
-                  <small>{model.name}</small>
+
+          <div className="gp-hero__stage" aria-label="Ghost Palette product preview">
+            <div className="gp-hero-stage">
+              <header className="gp-hero-stage__bar">
+                <span className="gp-hero-stage__label">Composer preview</span>
+                <span className="gp-hero-stage__status">
+                  {MODELS.length} models · one prompt
                 </span>
-              );
-            })}
+              </header>
+
+              <blockquote className="gp-hero-stage__prompt">
+                <p>{SHOWCASE_PROMPT}</p>
+              </blockquote>
+
+              <div className="gp-hero-stage__bento">
+                {MODELS.slice(0, 4).map((model) => {
+                  const src = sampleSrc("showcase", model.id);
+                  return (
+                    <figure className="gp-hero-stage__tile" key={model.id}>
+                      <div className={`gp-art ${model.artClass}`}>
+                        {src ? (
+                          <img
+                            className="gp-art__img is-live"
+                            src={src}
+                            alt={`${model.name} output for the showcase prompt`}
+                            loading="eager"
+                          />
+                        ) : null}
+                      </div>
+                      <figcaption>{model.name}</figcaption>
+                    </figure>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -123,7 +128,7 @@ export default function MarketingPage() {
       <section className="gp-features" id="features" aria-labelledby="features-title">
         <div className="gp-features__head">
           <h2 id="features-title">Three ways to compare</h2>
-          <p>Composer, Arena, and Evals — one model roster, three workflows.</p>
+          <p>Composer, Arena, and Refine — one model roster, three workflows.</p>
         </div>
         <div className="gp-features__grid">
           {FEATURES.map((feature) => (

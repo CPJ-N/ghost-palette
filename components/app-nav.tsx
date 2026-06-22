@@ -5,7 +5,6 @@ import { Images, Library, LogOut, Moon, Settings, Sun, Swords, Target } from "lu
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 
 const PRIMARY = [
   { href: "/composer", label: "Composer", icon: Images },
@@ -23,8 +22,6 @@ export function AppNav() {
   const { user } = useUser();
   const { signOut } = useClerk();
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
   const isDark = resolvedTheme !== "light";
 
   const initial = (
@@ -80,12 +77,12 @@ export function AppNav() {
           onClick={() => setTheme(isDark ? "light" : "dark")}
           aria-label="Toggle light and dark theme"
         >
-          {mounted && !isDark ? (
+          {!isDark ? (
             <Moon size={18} aria-hidden="true" />
           ) : (
             <Sun size={18} aria-hidden="true" />
           )}
-          <span>{mounted && !isDark ? "Dark mode" : "Light mode"}</span>
+          <span>{!isDark ? "Dark mode" : "Light mode"}</span>
         </button>
         <div className="gp-rail__account">
           <span className="gp-avatar" aria-hidden="true">

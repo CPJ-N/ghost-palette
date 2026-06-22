@@ -28,13 +28,20 @@ export function SiteFooter() {
             <p>Product</p>
             <Link href="/composer">Composer</Link>
             <Link href="/arena">Arena</Link>
-            <Link href="/evals">Evals</Link>
+            <Link href="/evals">Refine</Link>
             <Link href="/pricing">Pricing</Link>
           </div>
           <div>
             <p>Account</p>
             <Link href="/sign-in">Sign in</Link>
             <Link href="/sign-up">Create account</Link>
+          </div>
+          <div>
+            <p>Resources</p>
+            <Link href="/docs">Docs</Link>
+            <Link href="/docs/benchmarks">Benchmarks</Link>
+            <Link href="/leaderboard">Leaderboard</Link>
+            <Link href="/docs/methodology">Methodology</Link>
           </div>
           <div>
             <p>Company</p>

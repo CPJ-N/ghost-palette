@@ -3,6 +3,8 @@
 import { AlertTriangle, Eye, EyeOff, Loader2, Swords, Trophy } from "lucide-react";
 import { useState } from "react";
 
+import { SaveRunButton } from "@/components/save-run-button";
+
 import { createId, hashSeed } from "@/lib/domain";
 import { generateOne } from "@/lib/generate";
 import { getModel, MODELS } from "@/lib/models";
@@ -100,10 +102,11 @@ export default function ArenaPage() {
     <div className="gp-feature">
       <header className="gp-feature__head">
         <span className="gp-tag">Arena</span>
-        <h1>Head-to-head</h1>
+        <h1>Judge models head to head</h1>
         <p>
-          Same prompt, several models. Generate, then pick the winner
-          {blind ? " — blind, names hidden until you choose." : "."}
+          Run the same prompt through two or more models, compare the outputs,
+          and record which model produced the stronger result
+          {blind ? " with names hidden until you choose." : "."}
         </p>
       </header>
 
@@ -189,6 +192,14 @@ export default function ArenaPage() {
                     : "Outputs appear here as they finish."}
               </p>
             </div>
+            {winnerId ? (
+              <SaveRunButton
+                mode="arena"
+                prompt={prompt}
+                results={results}
+                winnerId={winnerId}
+              />
+            ) : null}
           </div>
 
           {results.length === 0 ? (

@@ -1,10 +1,14 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
+import { Check, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { MarketingNav } from "@/components/marketing-nav";
 import { SiteFooter } from "@/components/site-footer";
+import type { BillingInterval, PaidPlan } from "@/lib/stripe/catalog";
 
 const BASIC_OPTIONS = [
   { credits: 1000, price: 20 },
@@ -18,39 +22,72 @@ const PRO_OPTIONS = [
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 
+function lookupKey(
+  plan: PaidPlan,
+  credits: number,
+  interval: BillingInterval,
+): string {
+  const suffix = interval === "year" ? "annual" : "monthly";
+  return `gp_${plan}_${credits}_${suffix}`;
+}
+
 export default function PricingPage() {
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
   const [basic, setBasic] = useState(0);
   const basicTier = BASIC_OPTIONS[basic];
   const [pro, setPro] = useState(0);
   const proTier = PRO_OPTIONS[pro];
   const [annual, setAnnual] = useState(false);
+  const [busyPlan, setBusyPlan] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const per = annual ? "/yr" : "/mo";
   const billed = annual ? "Billed annually" : "Billed monthly";
   const amount = (monthly: number) => (annual ? monthly * 10 : monthly);
+  const interval: BillingInterval = annual ? "year" : "month";
+
+  async function startCheckout(plan: PaidPlan, credits: number) {
+    const key = lookupKey(plan, credits, interval);
+    if (!isSignedIn) {
+      router.push(`/sign-in?redirect_url=${encodeURIComponent("/pricing")}`);
+      return;
+    }
+
+    setBusyPlan(key);
+    setError(null);
+    try {
+      const response = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lookupKey: key }),
+      });
+      const data = (await response.json()) as { url?: string; error?: string };
+      if (!response.ok || !data.url) {
+        throw new Error(data.error ?? "Checkout failed");
+      }
+      window.location.href = data.url;
+    } catch (checkoutError) {
+      setError(
+        checkoutError instanceof Error
+          ? checkoutError.message
+          : "Checkout failed",
+      );
+      setBusyPlan(null);
+    }
+  }
 
   return (
     <main className="gp-shell">
-      <header className="gp-topnav" aria-label="Primary navigation">
-        <Link href="/" className="gp-nav__brand">
-          <span className="gp-mark" aria-hidden="true">
-            GP
-          </span>
-          <span>Ghost Palette</span>
-        </Link>
-        <div className="gp-topnav__right">
-          <Link className="gp-button gp-button--primary" href="/composer">
-            Open the app
-          </Link>
-        </div>
-      </header>
+      <MarketingNav />
 
       <section className="gp-pricing" aria-labelledby="pricing-title">
         <div className="gp-pricing__head">
           <h1 id="pricing-title">Credit-based pricing</h1>
           <p>
-            Every plan includes Composer, Arena, and Evals. Credits are spent per
+            Every plan includes Composer, Arena, and Refine. Credits are spent per
             generation — pick the volume you need, scale anytime.
           </p>
+          {error ? <p className="gp-pricing__error">{error}</p> : null}
           <div className="gp-billtoggle" role="group" aria-label="Billing period">
             <button
               type="button"
@@ -70,7 +107,6 @@ export default function PricingPage() {
         </div>
 
         <div className="gp-pricing__grid">
-          {/* Free */}
           <article className="gp-plan">
             <div className="gp-plan__head">
               <h2>Free</h2>
@@ -94,7 +130,6 @@ export default function PricingPage() {
             </Link>
           </article>
 
-          {/* Basic */}
           <article className="gp-plan">
             <div className="gp-plan__head">
               <h2>Basic</h2>
@@ -120,7 +155,7 @@ export default function PricingPage() {
             <p className="gp-plan__inherit">Everything in Free, plus</p>
             <ul className="gp-plan__features">
               <li>
-                <Check size={16} aria-hidden="true" /> Evals + similarity scoring
+                <Check size={16} aria-hidden="true" /> Refinement scoring
               </li>
               <li>
                 <Check size={16} aria-hidden="true" /> Saved Library
@@ -129,12 +164,19 @@ export default function PricingPage() {
                 <Check size={16} aria-hidden="true" /> Priority generation queue
               </li>
             </ul>
-            <Link className="gp-button gp-button--ghost gp-plan__cta" href="/composer">
+            <button
+              className="gp-button gp-button--ghost gp-plan__cta"
+              type="button"
+              disabled={busyPlan === lookupKey("basic", basicTier.credits, interval)}
+              onClick={() => startCheckout("basic", basicTier.credits)}
+            >
+              {busyPlan === lookupKey("basic", basicTier.credits, interval) ? (
+                <Loader2 className="gp-spin" size={16} aria-hidden="true" />
+              ) : null}
               Select plan
-            </Link>
+            </button>
           </article>
 
-          {/* Pro — featured */}
           <article className="gp-plan gp-plan--featured">
             <span className="gp-plan__badge">Recommended</span>
             <div className="gp-plan__head">
@@ -173,12 +215,19 @@ export default function PricingPage() {
                 <Check size={16} aria-hidden="true" /> Team seats
               </li>
             </ul>
-            <Link className="gp-button gp-button--primary gp-plan__cta" href="/composer">
+            <button
+              className="gp-button gp-button--primary gp-plan__cta"
+              type="button"
+              disabled={busyPlan === lookupKey("pro", proTier.credits, interval)}
+              onClick={() => startCheckout("pro", proTier.credits)}
+            >
+              {busyPlan === lookupKey("pro", proTier.credits, interval) ? (
+                <Loader2 className="gp-spin" size={16} aria-hidden="true" />
+              ) : null}
               Select plan
-            </Link>
+            </button>
           </article>
 
-          {/* Enterprise */}
           <article className="gp-plan">
             <div className="gp-plan__head">
               <h2>Enterprise</h2>

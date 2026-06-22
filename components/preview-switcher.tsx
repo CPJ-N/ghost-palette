@@ -1,22 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import { PREVIEW_THEMES } from "@/lib/preview-themes";
 import { cn } from "@/lib/utils";
 
+function subscribeEmbedded() {
+  return () => {};
+}
+
+function getEmbeddedSnapshot() {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
+function getServerEmbeddedSnapshot() {
+  return false;
+}
+
 export function PreviewSwitcher({ current }: { current: string }) {
   // Hide the chrome when this page is rendered inside the navigator's preview
   // iframes, so each thumbnail reads as a clean screenshot.
-  const [embedded, setEmbedded] = useState(false);
-  useEffect(() => {
-    try {
-      setEmbedded(window.self !== window.top);
-    } catch {
-      setEmbedded(true);
-    }
-  }, []);
+  const embedded = useSyncExternalStore(
+    subscribeEmbedded,
+    getEmbeddedSnapshot,
+    getServerEmbeddedSnapshot,
+  );
 
   if (embedded) return null;
 

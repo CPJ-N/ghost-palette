@@ -15,6 +15,8 @@ export const EXAMPLE_MODEL_IDS = [
 
 const SAMPLES = sampleManifest as Record<string, string>;
 
+export const BACKDROP_SOURCES = Object.values(SAMPLES);
+
 export function sampleSrc(set: "showcase" | "example", modelId: string) {
   return SAMPLES[`${set}-${modelId}`];
 }

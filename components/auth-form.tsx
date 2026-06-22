@@ -2,6 +2,7 @@
 
 import { useSignIn, useSignUp } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -163,7 +164,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       <Card className="relative z-10 w-full max-w-sm shadow-2xl">
         <CardContent className="space-y-5">
           <div className="flex flex-col items-center gap-3 text-center">
-            <a
+            <Link
               href="/"
               className="inline-flex items-center gap-2 font-semibold tracking-tight"
             >
@@ -174,7 +175,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 GP
               </span>
               Ghost Palette
-            </a>
+            </Link>
             <div className="space-y-1">
               <h1 className="text-xl font-semibold tracking-tight">
                 {pendingVerification
@@ -275,22 +276,22 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 {isSignUp ? (
                   <>
                     Already have an account?{" "}
-                    <a
+                    <Link
                       href="/sign-in"
                       className="font-medium text-foreground underline underline-offset-4 hover:text-primary"
                     >
                       Sign in
-                    </a>
+                    </Link>
                   </>
                 ) : (
                   <>
                     New to Ghost Palette?{" "}
-                    <a
+                    <Link
                       href="/sign-up"
                       className="font-medium text-foreground underline underline-offset-4 hover:text-primary"
                     >
                       Create one
-                    </a>
+                    </Link>
                   </>
                 )}
               </p>

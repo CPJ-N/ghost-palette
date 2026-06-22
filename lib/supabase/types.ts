@@ -273,6 +273,110 @@ export type Database = {
           },
         ];
       };
+      benchmark_suite_runs: {
+        Row: {
+          id: string;
+          user_id: string;
+          model_id: string;
+          suite_version: string;
+          status: string;
+          pass_count: number;
+          fail_count: number;
+          total_challenges: number;
+          category_filter: string | null;
+          created_at: string;
+          completed_at: string | null;
+        };
+        Insert: {
+          id: string;
+          user_id: string;
+          model_id: string;
+          suite_version?: string;
+          status?: string;
+          pass_count?: number;
+          fail_count?: number;
+          total_challenges: number;
+          category_filter?: string | null;
+          created_at?: string;
+          completed_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          model_id?: string;
+          suite_version?: string;
+          status?: string;
+          pass_count?: number;
+          fail_count?: number;
+          total_challenges?: number;
+          category_filter?: string | null;
+          created_at?: string;
+          completed_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "benchmark_suite_runs_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "profiles";
+            referencedColumns: ["user_id"];
+          },
+        ];
+      };
+      benchmark_challenge_results: {
+        Row: {
+          id: string;
+          suite_run_id: string;
+          user_id: string;
+          challenge_id: string;
+          model_id: string;
+          category: string;
+          image_url: string | null;
+          passed: boolean | null;
+          vlm_output: string | null;
+          latency_ms: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          suite_run_id: string;
+          user_id: string;
+          challenge_id: string;
+          model_id: string;
+          category: string;
+          image_url?: string | null;
+          passed?: boolean | null;
+          vlm_output?: string | null;
+          latency_ms?: number | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          suite_run_id?: string;
+          user_id?: string;
+          challenge_id?: string;
+          model_id?: string;
+          category?: string;
+          image_url?: string | null;
+          passed?: boolean | null;
+          vlm_output?: string | null;
+          latency_ms?: number | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "benchmark_challenge_results_suite_run_id_fkey";
+            columns: ["suite_run_id"];
+            referencedRelation: "benchmark_suite_runs";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "benchmark_challenge_results_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "profiles";
+            referencedColumns: ["user_id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -288,3 +392,7 @@ export type Run = Database["public"]["Tables"]["runs"]["Row"];
 export type Result = Database["public"]["Tables"]["results"]["Row"];
 export type Eval = Database["public"]["Tables"]["evals"]["Row"];
 export type EvalScore = Database["public"]["Tables"]["eval_scores"]["Row"];
+export type BenchmarkSuiteRunRow =
+  Database["public"]["Tables"]["benchmark_suite_runs"]["Row"];
+export type BenchmarkChallengeResultRow =
+  Database["public"]["Tables"]["benchmark_challenge_results"]["Row"];

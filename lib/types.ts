@@ -29,3 +29,10 @@ export type HistoryRun = {
   modelIds: string[];
   results: GenerationResult[];
 };
+
+/** A run persisted locally until Supabase storage ships. */
+export type SavedRun = HistoryRun & {
+  mode: RunMode;
+  savedAt: string;
+  winnerId?: string;
+};

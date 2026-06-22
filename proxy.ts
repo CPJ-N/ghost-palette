@@ -1,21 +1,29 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// The marketing landing (/) and auth pages stay public; the app + API routes
-// require a signed-in Clerk session.
+// Image generation workflows — require a signed-in Clerk session.
 const isProtected = createRouteMatcher([
   "/composer(.*)",
   "/arena(.*)",
   "/evals(.*)",
   "/library(.*)",
   "/settings(.*)",
-  "/api/(.*)",
+]);
+
+// Generation APIs only (benchmark suite runs generate + grade images).
+const isProtectedApi = createRouteMatcher([
+  "/api/generate(.*)",
+  "/api/benchmark/(.*)",
+  "/api/stripe/checkout(.*)",
 ]);
 
 // Public API routes that must NOT require a Clerk session (Stripe can't carry one).
 const isPublicApi = createRouteMatcher(["/api/stripe/webhook"]);
 
 export default clerkMiddleware(async (auth, request) => {
-  if (isProtected(request) && !isPublicApi(request)) {
+  const needsAuth =
+    (isProtected(request) || isProtectedApi(request)) && !isPublicApi(request);
+
+  if (needsAuth) {
     await auth.protect();
   }
 });

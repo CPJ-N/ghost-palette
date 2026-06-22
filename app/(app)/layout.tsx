@@ -1,16 +1,21 @@
-import { AppNav } from "@/components/app-nav";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-// Routes here are gated by proxy.ts (Clerk auth.protect). This shell wraps every
-// authed feature in the persistent side-rail.
+// Routes here are gated by proxy.ts for generation workflows. The shadcn sidebar is
+// the workspace frame for Composer, Arena, Refine, Library, and Settings.
 export default function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="gp-app">
-      <AppNav />
-      <main className="gp-appmain">{children}</main>
-    </div>
+    <SidebarProvider className="gp-app">
+      <AppSidebar />
+      <SidebarInset className="gp-app__inset">
+        <SiteHeader />
+        <div className="gp-appmain">{children}</div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
