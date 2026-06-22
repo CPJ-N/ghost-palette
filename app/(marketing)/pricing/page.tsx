@@ -11,13 +11,22 @@ const BASIC_OPTIONS = [
   { credits: 2000, price: 40 },
 ];
 
-const PRO = { credits: 5000, price: 100 };
+const PRO_OPTIONS = [
+  { credits: 5000, price: 100 },
+  { credits: 10000, price: 200 },
+];
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 
 export default function PricingPage() {
   const [basic, setBasic] = useState(0);
   const basicTier = BASIC_OPTIONS[basic];
+  const [pro, setPro] = useState(0);
+  const proTier = PRO_OPTIONS[pro];
+  const [annual, setAnnual] = useState(false);
+  const per = annual ? "/yr" : "/mo";
+  const billed = annual ? "Billed annually" : "Billed monthly";
+  const amount = (monthly: number) => (annual ? monthly * 10 : monthly);
 
   return (
     <main className="gp-shell">
@@ -42,6 +51,22 @@ export default function PricingPage() {
             Every plan includes Composer, Arena, and Evals. Credits are spent per
             generation — pick the volume you need, scale anytime.
           </p>
+          <div className="gp-billtoggle" role="group" aria-label="Billing period">
+            <button
+              type="button"
+              className={`gp-billtoggle__opt ${annual ? "" : "is-active"}`}
+              onClick={() => setAnnual(false)}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              className={`gp-billtoggle__opt ${annual ? "is-active" : ""}`}
+              onClick={() => setAnnual(true)}
+            >
+              Annual <span className="gp-billtoggle__save">2 months free</span>
+            </button>
+          </div>
         </div>
 
         <div className="gp-pricing__grid">
@@ -74,10 +99,10 @@ export default function PricingPage() {
             <div className="gp-plan__head">
               <h2>Basic</h2>
               <p className="gp-plan__price">
-                ${basicTier.price}
-                <span>/mo</span>
+                ${amount(basicTier.price)}
+                <span>{per}</span>
               </p>
-              <p className="gp-plan__billed">Billed monthly</p>
+              <p className="gp-plan__billed">{billed}</p>
             </div>
             <label className="gp-plan__select">
               <select
@@ -115,14 +140,24 @@ export default function PricingPage() {
             <div className="gp-plan__head">
               <h2>Pro</h2>
               <p className="gp-plan__price">
-                ${PRO.price}
-                <span>/mo</span>
+                ${amount(proTier.price)}
+                <span>{per}</span>
               </p>
-              <p className="gp-plan__billed">Billed monthly</p>
+              <p className="gp-plan__billed">{billed}</p>
             </div>
-            <div className="gp-plan__select gp-plan__select--static">
-              {fmt(PRO.credits)} credits per month
-            </div>
+            <label className="gp-plan__select">
+              <select
+                value={pro}
+                onChange={(event) => setPro(Number(event.target.value))}
+                aria-label="Credits per month"
+              >
+                {PRO_OPTIONS.map((option, index) => (
+                  <option key={option.credits} value={index}>
+                    {fmt(option.credits)} credits per month
+                  </option>
+                ))}
+              </select>
+            </label>
             <p className="gp-plan__inherit">Everything in Basic, plus</p>
             <ul className="gp-plan__features">
               <li>
