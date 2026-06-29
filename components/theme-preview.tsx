@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 const CANDIDATES = [
   { name: "FLUX.2 [pro]", img: "/samples/example-flux2-pro.jpg", score: 96, win: true },
   { name: "FLUX.2 [dev]", img: "/samples/example-flux2-dev.png", score: 89, win: false },
-  { name: "FLUX.1 [dev]", img: "/samples/example-flux1-dev.jpg", score: 82, win: false },
   { name: "SD 3.5 Large", img: "/samples/example-sd35-large.jpg", score: 77, win: false },
 ];
 

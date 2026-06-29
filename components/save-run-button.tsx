@@ -25,21 +25,56 @@ export function SaveRunButton({
   const runId = results[0]?.runId;
   const [saved, setSaved] = useState(() => (runId ? hasSavedRun(runId) : false));
   const [busy, setBusy] = useState(false);
+  // True when the local cache write succeeded but the cloud POST did not.
+  const [cloudError, setCloudError] = useState(false);
 
   const canSave =
     !disabled &&
     prompt.trim().length > 0 &&
     results.some((result) => result.status === "complete");
 
-  function onSave() {
+  async function onSave() {
     if (!canSave || saved || busy) {
       return;
     }
     setBusy(true);
+    setCloudError(false);
+    // Write the offline cache first so the Library keeps the run even if the
+    // network request fails; the cloud POST is the durable copy.
     saveRun({ mode, prompt, results, winnerId });
     setSaved(true);
-    setBusy(false);
+    try {
+      const response = await fetch("/api/runs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt,
+          mode,
+          winnerId,
+          results: results
+            .filter((result) => result.status === "complete")
+            .map((result) => ({
+              modelId: result.modelId,
+              url: result.url,
+              seed: result.seed,
+            })),
+        }),
+      });
+      setCloudError(!response.ok);
+    } catch {
+      setCloudError(true);
+    } finally {
+      setBusy(false);
+    }
   }
+
+  const label = busy
+    ? "Saving…"
+    : saved
+      ? cloudError
+        ? "Saved offline"
+        : "Saved to Library"
+      : "Save to Library";
 
   return (
     <Button
@@ -47,9 +82,14 @@ export function SaveRunButton({
       size="lg"
       className={`gp-button ${saved ? "gp-button--ghost" : "gp-button--outline"}`}
       type="button"
-      onClick={onSave}
+      onClick={() => void onSave()}
       disabled={!canSave || saved || busy}
       aria-busy={busy}
+      title={
+        saved && cloudError
+          ? "Saved in this browser. Cloud sync failed — it will retry next time."
+          : undefined
+      }
     >
       {busy ? (
         <Loader2 className="gp-spin" size={16} aria-hidden="true" />
@@ -58,7 +98,7 @@ export function SaveRunButton({
       ) : (
         <BookmarkPlus size={16} aria-hidden="true" />
       )}
-      {saved ? "Saved to Library" : "Save to Library"}
+      {label}
     </Button>
   );
 }

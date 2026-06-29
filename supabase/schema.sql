@@ -1,7 +1,8 @@
 -- Ghost Palette — Supabase schema. Run in the Supabase SQL editor.
 -- All rows are scoped by Clerk user_id; the app accesses Supabase with the
 -- service-role key server-side and always filters by the session user_id.
--- (Add RLS policies later for defense-in-depth.)
+-- RLS is enabled on profiles + credit_transactions for defense-in-depth (see
+-- the "Row Level Security" section at the end of this file).
 
 -- Per-user profile, credit balance, Stripe linkage.
 create table if not exists profiles (
@@ -182,9 +183,12 @@ create table if not exists runs (
   prompt     text not null,
   model_ids  jsonb not null,
   seeds      jsonb,
+  winner_id  text,                                 -- result id picked as winner (arena / eval)
   created_at timestamptz not null default now()
 );
 create index if not exists runs_user_idx on runs (user_id, created_at desc);
+-- Existing deployments: add the winner column if the table predates it.
+alter table runs add column if not exists winner_id text;
 
 -- One generated image.
 create table if not exists results (
@@ -270,3 +274,39 @@ create index if not exists benchmark_results_model_idx
   on benchmark_challenge_results (model_id, passed);
 create index if not exists benchmark_results_suite_idx
   on benchmark_challenge_results (suite_run_id);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Row Level Security (defense-in-depth)
+--
+-- The server accesses Supabase with the service-role key, which BYPASSES RLS, so
+-- enabling RLS here does NOT change app behavior. The point is to fail closed for
+-- the public anon key (NEXT_PUBLIC_SUPABASE_ANON_KEY): with RLS on and no policy
+-- matching the anon role, the public key can read nothing from these tables.
+--
+-- user_id holds the Clerk user id, which equals the JWT `sub` claim, so the
+-- own-row predicate is `user_id = auth.jwt()->>'sub'` (NOT auth.uid(), which is a
+-- Supabase-Auth UUID). These SELECT policies scope reads to the caller's own rows
+-- should a Clerk JWT ever be passed from the client.
+--
+-- Writes are intentionally NOT granted to end users: every profile/credit
+-- mutation goes through service-role server routes (and the adjust_credits /
+-- set_credits functions). Granting a user self-UPDATE on credit_balance/plan or
+-- self-INSERT into the append-only ledger would be a privilege-escalation hole.
+--
+-- Idempotent: enable-RLS is a no-op if already on; policies are guarded by
+-- `drop policy if exists` before each `create policy`.
+
+alter table profiles enable row level security;
+alter table credit_transactions enable row level security;
+
+-- profiles: a user may read only their own profile row.
+drop policy if exists profiles_select_own on profiles;
+create policy profiles_select_own on profiles
+  for select to authenticated
+  using (user_id = auth.jwt()->>'sub');
+
+-- credit_transactions: a user may read only their own ledger rows.
+drop policy if exists credit_tx_select_own on credit_transactions;
+create policy credit_tx_select_own on credit_transactions
+  for select to authenticated
+  using (user_id = auth.jwt()->>'sub');

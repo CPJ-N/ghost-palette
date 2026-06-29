@@ -6,15 +6,8 @@ export const SHOWCASE_PROMPT =
   "A weathered brass compass resting on a linen map beside a fountain pen, soft directional window light.";
 export const EXAMPLE_PROMPT =
   "A single ripe persimmon on a raw concrete plinth, raking studio light, shallow depth of field.";
-export const EXAMPLE_MODEL_IDS = [
-  "flux2-pro",
-  "flux2-dev",
-  "sd35-large",
-];
 
 const SAMPLES = sampleManifest as Record<string, string>;
-
-export const BACKDROP_SOURCES = Object.values(SAMPLES);
 
 export function sampleSrc(set: "showcase" | "example", modelId: string) {
   return SAMPLES[`${set}-${modelId}`];

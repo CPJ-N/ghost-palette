@@ -26,15 +26,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCredits } from "@/hooks/use-credits";
 import { createId, hashSeed } from "@/lib/domain";
 import { generateOne } from "@/lib/generate";
-import { getModel, MODELS } from "@/lib/models";
+import { DEFAULT_SELECTION, getModel, MODELS } from "@/lib/models";
 import type { GenerationResult } from "@/lib/types";
 
-const DEFAULT = ["flux2-pro", "flux2-dev"];
 const MAX_BATCH_SIZE = 4;
 
 export default function ArenaPage() {
   const [prompt, setPrompt] = useState("");
-  const [selected, setSelected] = useState<string[]>(DEFAULT);
+  const [selected, setSelected] = useState<string[]>(DEFAULT_SELECTION);
   const [batchSize, setBatchSize] = useState(1);
   const [results, setResults] = useState<GenerationResult[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);

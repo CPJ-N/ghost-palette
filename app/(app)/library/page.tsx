@@ -2,7 +2,7 @@
 
 import { Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import {
   Card,
@@ -37,11 +37,44 @@ function formatWhen(iso: string) {
 }
 
 export default function LibraryPage() {
-  const runs = useSyncExternalStore(
+  // Offline cache (synchronous, always available).
+  const localRuns = useSyncExternalStore(
     subscribeSavedRuns,
     loadSavedRuns,
     () => EMPTY_RUNS,
   );
+  // Server copy from /api/runs; null until the request resolves.
+  const [serverRuns, setServerRuns] = useState<SavedRun[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const response = await fetch("/api/runs");
+        if (!response.ok) return;
+        const data = (await response.json()) as { runs?: SavedRun[] };
+        if (!cancelled && Array.isArray(data.runs)) {
+          setServerRuns(data.runs);
+        }
+      } catch {
+        // Network/auth failure — fall back to the localStorage cache below.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Prefer the synced account copy; fall back to the local cache when the
+  // request failed (serverRuns === null) or returned nothing.
+  const runs = serverRuns && serverRuns.length > 0 ? serverRuns : localRuns;
+
+  function handleDelete(id: string) {
+    // Clear the local cache copy and optimistically drop it from the synced
+    // list so the row disappears regardless of which source is showing.
+    deleteSavedRun(id);
+    setServerRuns((prev) => (prev ? prev.filter((run) => run.id !== id) : prev));
+  }
 
   return (
     <div className="gp-feature">
@@ -51,8 +84,8 @@ export default function LibraryPage() {
         </Badge>
         <h1>Saved images and model picks</h1>
         <p>
-          Studio winners and refinement outputs you save appear here. Runs stay
-          in this browser until Supabase persistence ships.
+          Studio winners and refinement outputs you save appear here, synced to
+          your account with an offline copy kept in this browser.
         </p>
       </header>
 
@@ -86,7 +119,7 @@ export default function LibraryPage() {
                     size="lg"
                     className="gp-button gp-button--ghost gp-library__delete"
                     type="button"
-                    onClick={() => deleteSavedRun(run.id)}
+                    onClick={() => handleDelete(run.id)}
                     aria-label="Delete saved run"
                   >
                     <Trash2 size={16} aria-hidden="true" />
