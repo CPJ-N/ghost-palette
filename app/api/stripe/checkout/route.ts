@@ -88,13 +88,11 @@ export async function POST(request: Request) {
     mode: "subscription",
     line_items: [{ price: price.id, quantity: 1 }],
     client_reference_id: userId,
-    // Stripe Tax: compute tax automatically and collect a billing address so
-    // the tax location can be determined. `customer_update.address: "auto"`
-    // lets Checkout save the collected address back onto a reused customer.
-    automatic_tax: { enabled: true },
-    billing_address_collection: "required",
+    // NOTE: Stripe Tax (automatic_tax) is intentionally NOT enabled yet — turn it
+    // on in the Dashboard (activate Tax + set an origin address) first, then
+    // re-add `automatic_tax: { enabled: true }` + `billing_address_collection`.
     ...(existingCustomer
-      ? { customer: existingCustomer, customer_update: { address: "auto" } }
+      ? { customer: existingCustomer }
       : { customer_email: email }),
     metadata: {
       userId,
