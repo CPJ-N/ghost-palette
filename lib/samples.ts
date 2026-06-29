@@ -9,7 +9,6 @@ export const EXAMPLE_PROMPT =
 export const EXAMPLE_MODEL_IDS = [
   "flux2-pro",
   "flux2-dev",
-  "flux1-dev",
   "sd35-large",
 ];
 

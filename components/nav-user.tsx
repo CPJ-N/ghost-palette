@@ -2,16 +2,16 @@
 
 import { useClerk, useUser } from "@clerk/nextjs";
 import {
-  BadgeCheckIcon,
   ChevronsUpDownIcon,
-  CreditCardIcon,
   LogOutIcon,
   MoonIcon,
+  SettingsIcon,
   SunIcon,
 } from "lucide-react";
-import Link from "next/link";
+import { useState } from "react";
 import { useTheme } from "next-themes";
 
+import { SettingsDialog } from "@/components/settings-dialog";
 import {
   Avatar,
   AvatarFallback,
@@ -54,8 +54,10 @@ export function NavUser() {
   const name = user?.fullName ?? user?.firstName ?? "Ghost Palette";
   const avatar = user?.imageUrl;
   const isDark = resolvedTheme !== "light";
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
+    <>
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
@@ -81,9 +83,9 @@ export function NavUser() {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
+            side={isMobile ? "bottom" : "top"}
+            align="start"
+            sideOffset={8}
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <span className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
@@ -103,17 +105,13 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href="/settings/account">
-                  <BadgeCheckIcon />
-                  Account
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/pricing">
-                  <CreditCardIcon />
-                  Billing
-                </Link>
+              <DropdownMenuItem
+                onSelect={() => {
+                  setTimeout(() => setSettingsOpen(true));
+                }}
+              >
+                <SettingsIcon />
+                Settings
               </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={(event) => {
@@ -139,5 +137,7 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
+      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+    </>
   );
 }

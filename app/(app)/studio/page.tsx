@@ -79,24 +79,39 @@ export default function ArenaPage() {
 
   async function start() {
     const trimmed = prompt.trim();
-    if (!trimmed || selected.length < 1 || isGenerating) {
+    if (!trimmed || isGenerating) {
+      return;
+    }
+    if (selected.length < 1) {
+      setRunError("Select at least one model to generate.");
       return;
     }
 
-    const latestCredits = await refreshCredits();
-    if (!latestCredits) {
-      setRunError("Credits are unavailable. Check the Supabase connection.");
-      return;
-    }
-    if (latestCredits.balance < selectedCost) {
+    if (!credits) {
+      const latest = await refreshCredits();
+      if (!latest) {
+        setRunError("Credits are unavailable. Check the Supabase connection.");
+        return;
+      }
+      if (latest.balance < selectedCost) {
+        setRunError(
+          `This run needs ${selectedCost} credits. You have ${latest.balance}.`,
+        );
+        return;
+      }
+    } else if (credits.balance < selectedCost) {
       setRunError(
-        `This run needs ${selectedCost} credits. You have ${latestCredits.balance}.`,
+        `This run needs ${selectedCost} credits. You have ${credits.balance}.`,
       );
       return;
     }
 
+    // Immediate feedback: flip to generating + show the rendering grid BEFORE any
+    // network call, so pressing Enter / the arrow visibly registers at once.
+    // The server re-checks credits per image and refunds on failure.
     setWinnerId(null);
     setRunError(null);
+    setIsGenerating(true);
 
     const runId = createId("run");
     const createdAt = new Date().toISOString();
@@ -113,10 +128,10 @@ export default function ArenaPage() {
       })),
     );
 
-    setIsGenerating(true);
     setResults(queued);
+    setPrompt("");
 
-    await Promise.all(
+    const outcomes = await Promise.all(
       queued.map(async (item) => {
         try {
           const data = await generateOne(item.modelId, trimmed, {
@@ -135,6 +150,7 @@ export default function ArenaPage() {
                 : result,
             ),
           );
+          return true;
         } catch (error) {
           setResults((current) =>
             current.map((result) =>
@@ -148,11 +164,18 @@ export default function ArenaPage() {
                 : result,
             ),
           );
+          return false;
         }
       }),
     );
 
     setIsGenerating(false);
+
+    if (!outcomes.some(Boolean)) {
+      setPrompt(trimmed);
+      setRunError("Generation failed — please try again.");
+    }
+
     await refreshCredits();
   }
 
@@ -168,7 +191,10 @@ export default function ArenaPage() {
 
   return (
     <div className="gp-composer-studio">
-      <section className="gp-composer-studio__content" aria-live="polite">
+      <section
+        className={`gp-composer-studio__content${results.length ? " has-results" : ""}`}
+        aria-live="polite"
+      >
         {results.length === 0 ? (
           <h1 className="gp-composer-studio__headline">
             Describe an image, then run it across models.
@@ -189,13 +215,15 @@ export default function ArenaPage() {
                     ? "Choose the output that best matches the prompt."
                     : allDone
                       ? "Save the output or run another direction."
-                      : "Images appear here as models finish."}
+                      : `${
+                          results.filter((r) => r.status === "complete").length
+                        } of ${results.length} ready…`}
                 </p>
               </div>
               {winnerId || (allDone && hasCompleteResults) ? (
                 <SaveRunButton
                   mode="arena"
-                  prompt={prompt}
+                  prompt={results[0]?.prompt ?? prompt}
                   results={results}
                   winnerId={winnerId ?? undefined}
                 />
@@ -221,7 +249,14 @@ export default function ArenaPage() {
                       aria-label={modelLabel}
                     >
                       {result.status === "complete" && result.url ? (
-                        <img className="gp-art__img is-live" src={result.url} alt="" />
+                        <img
+                          className="gp-art__img is-live"
+                          src={result.url}
+                          alt=""
+                          onLoad={(event) =>
+                            event.currentTarget.classList.add("is-loaded")
+                          }
+                        />
                       ) : null}
                       {result.status === "generating" ? (
                         <span className="gp-art__state">
@@ -278,8 +313,18 @@ export default function ArenaPage() {
           className="min-h-0 resize-none rounded-none border-0 bg-transparent px-0 py-0 shadow-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent"
           value={prompt}
           onChange={(event) => setPrompt(event.target.value)}
-          rows={2}
-          placeholder="Describe your image..."
+          onKeyDown={(event) => {
+            if (
+              event.key === "Enter" &&
+              !event.shiftKey &&
+              !event.nativeEvent.isComposing
+            ) {
+              event.preventDefault();
+              void start();
+            }
+          }}
+          rows={1}
+          placeholder="Describe your image…"
         />
 
         <div className="gp-composer-dock__bar">

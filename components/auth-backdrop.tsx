@@ -1,6 +1,6 @@
 import { sampleSrc } from "@/lib/samples";
 
-const MODEL_IDS = ["flux2-pro", "flux2-dev", "flux1-dev", "sd35-large", "recraft-v3"];
+const MODEL_IDS = ["flux2-pro", "flux2-dev", "sd35-large", "recraft-v3"];
 
 // Every real sample (showcase + example), collected once.
 const BASE: string[] = [];

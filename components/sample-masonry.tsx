@@ -16,12 +16,10 @@ type Tile = {
 const TILES: Tile[] = [
   { set: "showcase", modelId: "flux2-pro", ratio: "4 / 5", top: true },
   { set: "example", modelId: "flux2-dev", ratio: "1 / 1" },
-  { set: "showcase", modelId: "flux1-dev", ratio: "3 / 4" },
   { set: "example", modelId: "sd35-large", ratio: "1 / 1" },
   { set: "showcase", modelId: "recraft-v3", ratio: "4 / 5" },
   { set: "example", modelId: "flux2-pro", ratio: "1 / 1" },
   { set: "showcase", modelId: "flux2-dev", ratio: "3 / 4" },
-  { set: "example", modelId: "flux1-dev", ratio: "4 / 5" },
   { set: "showcase", modelId: "sd35-large", ratio: "1 / 1" },
 ];
 
@@ -32,7 +30,7 @@ export function SampleMasonry() {
         <p className="gp-kicker">The studio gallery</p>
         <h2 id="gallery-title">One brief can become five different directions.</h2>
         <p>
-          Real outputs from FLUX.2, FLUX.1, SD&nbsp;3.5 and Recraft — the same
+          Real outputs from FLUX.2, SD&nbsp;3.5 and Recraft — the same
           brief, generated side by side so you can choose the image and the
           model with confidence.
         </p>

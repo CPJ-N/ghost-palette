@@ -7,7 +7,6 @@ import {
   Brush,
   Library,
   LifeBuoy,
-  Settings,
   SlidersHorizontal,
   Trophy,
   FlaskConical,
@@ -66,11 +65,6 @@ const evaluation = [
     title: "Library",
     url: "/library",
     icon: Library,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
   },
 ];
 

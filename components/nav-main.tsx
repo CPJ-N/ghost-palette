@@ -47,11 +47,6 @@ export function NavMain({
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>
-              {item.description ? (
-                <p className="gp-sidebar-desc group-data-[collapsible=icon]:hidden">
-                  {item.description}
-                </p>
-              ) : null}
             </SidebarMenuItem>
           );
         })}

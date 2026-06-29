@@ -22,6 +22,8 @@ export const MODELS: ModelDefinition[] = [
     creditCost: 2,
     artClass: "art-flux2-pro",
   },
+  // DEV/TESTING ONLY: FLUX.2 [dev] has a non-commercial license. Keep it while
+  // building the app, but REMOVE before production / general launch.
   {
     id: "flux2-dev",
     name: "FLUX.2 [dev]",
@@ -30,15 +32,6 @@ export const MODELS: ModelDefinition[] = [
     adapter: "fal-ai/flux-2",
     creditCost: 1,
     artClass: "art-flux2-dev",
-  },
-  {
-    id: "flux1-dev",
-    name: "FLUX.1 [dev]",
-    provider: "fal",
-    description: "Previous-gen FLUX — a softer, more painterly interpretation.",
-    adapter: "fal-ai/flux/dev",
-    creditCost: 2,
-    artClass: "art-flux1-dev",
   },
   {
     id: "sd35-large",
@@ -58,10 +51,47 @@ export const MODELS: ModelDefinition[] = [
     creditCost: 2,
     artClass: "art-recraft",
   },
+  {
+    id: "seedream-4",
+    name: "Seedream 4",
+    provider: "fal",
+    description: "ByteDance's latest — top-ranked photoreal detail and prompt adherence.",
+    adapter: "fal-ai/bytedance/seedream/v4/text-to-image",
+    creditCost: 3,
+    artClass: "art-flux2-pro",
+  },
+  {
+    id: "qwen-image",
+    name: "Qwen Image",
+    provider: "fal",
+    description: "Alibaba Qwen — standout complex text rendering and layout control.",
+    adapter: "fal-ai/qwen-image",
+    creditCost: 2,
+    artClass: "art-flux1-dev",
+  },
+  {
+    id: "ideogram-v3",
+    name: "Ideogram V3",
+    provider: "fal",
+    description: "Best-in-class typography — near-perfect spelling, logos, and posters.",
+    adapter: "fal-ai/ideogram/v3",
+    creditCost: 4,
+    artClass: "art-recraft",
+  },
 ];
 
-export const DEFAULT_SELECTION = ["flux2-pro", "flux2-dev", "flux1-dev"];
+export const DEFAULT_SELECTION = ["flux2-pro", "flux2-dev"];
 
 export function getModel(modelId: string): ModelDefinition {
-  return MODELS.find((model) => model.id === modelId) ?? MODELS[0];
+  return (
+    MODELS.find((model) => model.id === modelId) ?? {
+      id: modelId,
+      name: "Unknown model",
+      provider: "fal",
+      description: "This model is no longer available.",
+      adapter: "",
+      creditCost: 0,
+      artClass: "art-sd35",
+    }
+  );
 }
