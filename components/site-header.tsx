@@ -1,16 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BadgeCheck, GalleryHorizontalEnd } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useCredits } from "@/hooks/use-credits";
 
 const ROUTES: Record<string, { title: string; description: string }> = {
-  "/arena": {
+  "/studio": {
     title: "Create",
     description: "Generate images and compare models when the brief needs it.",
   },
@@ -49,7 +47,7 @@ function currentRoute(pathname: string) {
     .sort((a, b) => b.length - a.length)
     .find((route) => pathname === route || pathname.startsWith(`${route}/`));
 
-  return match ? ROUTES[match] : ROUTES["/arena"];
+  return match ? ROUTES[match] : ROUTES["/studio"];
 }
 
 export function SiteHeader() {
@@ -72,12 +70,6 @@ export function SiteHeader() {
           <BadgeCheck size={15} aria-hidden="true" />
           {credits ? `${credits.balance} credits` : "Image studio"}
         </span>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/pricing">
-            <GalleryHorizontalEnd />
-            Pricing
-          </Link>
-        </Button>
       </div>
     </header>
   );

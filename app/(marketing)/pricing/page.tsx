@@ -134,7 +134,7 @@ export default function PricingPage() {
                 <Check size={16} aria-hidden="true" /> All five models
               </li>
             </ul>
-            <Link className="gp-button gp-button--ghost gp-plan__cta" href="/arena">
+            <Link className="gp-button gp-button--ghost gp-plan__cta" href="/studio">
               Get started
             </Link>
           </article>

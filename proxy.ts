@@ -2,6 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 // Image generation workflows — require a signed-in Clerk session.
 const isProtected = createRouteMatcher([
+  "/studio(.*)",
   "/composer(.*)",
   "/arena(.*)",
   "/evals(.*)",

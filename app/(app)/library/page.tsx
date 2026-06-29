@@ -19,6 +19,10 @@ import {
 import { getModel } from "@/lib/models";
 import type { SavedRun } from "@/lib/types";
 
+// Stable empty reference for the server/initial snapshot (a fresh [] each call
+// would also trip useSyncExternalStore's snapshot-stability check).
+const EMPTY_RUNS: SavedRun[] = [];
+
 const MODE_LABEL: Record<SavedRun["mode"], string> = {
   composer: "Composer",
   arena: "Create",
@@ -35,8 +39,8 @@ function formatWhen(iso: string) {
 export default function LibraryPage() {
   const runs = useSyncExternalStore(
     subscribeSavedRuns,
-    () => loadSavedRuns(),
-    () => [] as SavedRun[],
+    loadSavedRuns,
+    () => EMPTY_RUNS,
   );
 
   return (
@@ -55,7 +59,7 @@ export default function LibraryPage() {
       {runs.length === 0 ? (
         <div className="gp-listempty">
           Nothing saved yet. Generate in{" "}
-          <Link href="/arena">Create</Link> or{" "}
+          <Link href="/studio">Create</Link> or{" "}
           <Link href="/evals">Refine</Link>, then use Save to Library.
         </div>
       ) : (

@@ -62,7 +62,7 @@ function Divider() {
 }
 
 function redirectTarget(value: string | null, currentOrigin?: string | null): string {
-  if (!value) return "/";
+  if (!value) return "/studio";
   if (value.startsWith("/")) return value;
 
   try {
@@ -71,10 +71,10 @@ function redirectTarget(value: string | null, currentOrigin?: string | null): st
       return `${url.pathname}${url.search}${url.hash}`;
     }
   } catch {
-    return "/";
+    return "/studio";
   }
 
-  return "/";
+  return "/studio";
 }
 
 export function AuthForm({ mode }: { mode: Mode }) {

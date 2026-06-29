@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 
 const PRIMARY = [
-  { href: "/arena", label: "Create", icon: Brush },
+  { href: "/studio", label: "Create", icon: Brush },
   { href: "/evals", label: "Refine", icon: SlidersHorizontal },
 ];
 

@@ -62,7 +62,7 @@ export default function MarketingPage() {
             </nav>
 
             <div className="gp-hero__actions">
-              <Link className="gp-button gp-button--primary" href="/arena">
+              <Link className="gp-button gp-button--primary" href="/studio">
                 Open Studio
               </Link>
               <Link className="gp-button gp-button--ghost" href="/pricing">
@@ -149,7 +149,7 @@ export default function MarketingPage() {
 
       <section className="gp-cta" aria-labelledby="cta-title">
         <h2 id="cta-title">Start with the image. Let the model choice get smarter.</h2>
-        <Link className="gp-button gp-button--primary" href="/arena">
+        <Link className="gp-button gp-button--primary" href="/studio">
           Open Studio
           <ArrowUpRight size={18} aria-hidden="true" />
         </Link>

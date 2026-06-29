@@ -64,7 +64,7 @@ export function MarketingNav({ homeAnchors, links = NAV_LINKS }: MarketingNavPro
             Sign in
           </Link>
         ) : null}
-        <Link className="gp-button gp-button--primary" href="/arena">
+        <Link className="gp-button gp-button--primary" href="/studio">
           Open Studio
         </Link>
       </div>

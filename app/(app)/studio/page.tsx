@@ -3,21 +3,14 @@
 import {
   AlertTriangle,
   ArrowUp,
-  BadgeCheck,
-  Eye,
-  EyeOff,
-  GalleryHorizontalEnd,
-  Library,
   Loader2,
   Minus,
   Plus,
-  Settings,
   Trophy,
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { ComposerBackdrop } from "@/components/composer-backdrop";
 import { SaveRunButton } from "@/components/save-run-button";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,11 +38,9 @@ export default function ArenaPage() {
   const [batchSize, setBatchSize] = useState(1);
   const [results, setResults] = useState<GenerationResult[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [blind, setBlind] = useState(true);
   const [winnerId, setWinnerId] = useState<string | null>(null);
-  const [revealed, setRevealed] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
-  const { credits, creditError, isLoadingCredits, refreshCredits } = useCredits();
+  const { credits, creditError, refreshCredits } = useCredits();
 
   const selectedCost = useMemo(
     () =>
@@ -105,7 +96,6 @@ export default function ArenaPage() {
     }
 
     setWinnerId(null);
-    setRevealed(false);
     setRunError(null);
 
     const runId = createId("run");
@@ -168,7 +158,6 @@ export default function ArenaPage() {
 
   const allDone = results.length > 0 && results.every((r) => r.status !== "generating");
   const hasCompleteResults = results.some((r) => r.status === "complete");
-  const showNames = revealed || !blind || !isComparison;
   const composerNotice =
     runError ??
     (hasInsufficientCredits
@@ -179,47 +168,6 @@ export default function ArenaPage() {
 
   return (
     <div className="gp-composer-studio">
-      <ComposerBackdrop />
-      <div className="gp-composer-studio__veil" />
-
-      <header className="gp-composer-topbar" aria-label="Studio navigation">
-        <Link href="/" className="gp-composer-topbar__brand">
-          <span className="gp-mark" aria-hidden="true">
-            GP
-          </span>
-          <span>Ghost Palette</span>
-        </Link>
-        <div className="gp-composer-topbar__right">
-          <span className="gp-composer-topbar__status">
-            <BadgeCheck size={15} aria-hidden="true" />
-            {isLoadingCredits && !credits
-              ? "Checking credits"
-              : credits
-                ? `${credits.balance} credits`
-                : "Credits unavailable"}
-          </span>
-          <button
-            className="gp-composer-topbar__pill"
-            type="button"
-            onClick={() => setBlind((value) => !value)}
-            disabled={!isComparison}
-          >
-            {blind ? <EyeOff size={15} aria-hidden="true" /> : <Eye size={15} aria-hidden="true" />}
-            {isComparison ? (blind ? "Blind" : "Named") : "Named"}
-          </button>
-          <Link className="gp-composer-topbar__pill" href="/library">
-            <Library size={15} aria-hidden="true" />
-            Library
-          </Link>
-          <Link className="gp-composer-topbar__icon" href="/pricing" aria-label="Pricing">
-            <GalleryHorizontalEnd size={17} aria-hidden="true" />
-          </Link>
-          <Link className="gp-composer-topbar__icon" href="/settings" aria-label="Settings">
-            <Settings size={17} aria-hidden="true" />
-          </Link>
-        </div>
-      </header>
-
       <section className="gp-composer-studio__content" aria-live="polite">
         {results.length === 0 ? (
           <h1 className="gp-composer-studio__headline">
@@ -255,12 +203,10 @@ export default function ArenaPage() {
             </div>
 
             <div className="gp-composer-studio__grid">
-              {results.map((result, index) => {
+              {results.map((result) => {
                 const model = getModel(result.modelId);
                 const isWinner = winnerId === result.id;
-                const modelLabel = showNames
-                  ? model.name
-                  : `Model ${String.fromCharCode(65 + index)}`;
+                const modelLabel = model.name;
 
                 return (
                   <article
@@ -305,7 +251,6 @@ export default function ArenaPage() {
                           type="button"
                           onClick={() => {
                             setWinnerId(result.id);
-                            setRevealed(true);
                           }}
                           disabled={Boolean(winnerId) && !isWinner}
                         >
@@ -330,9 +275,10 @@ export default function ArenaPage() {
       >
         <Textarea
           aria-label="Prompt"
+          className="min-h-0 resize-none rounded-none border-0 bg-transparent px-0 py-0 shadow-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent"
           value={prompt}
           onChange={(event) => setPrompt(event.target.value)}
-          rows={3}
+          rows={2}
           placeholder="Describe your image..."
         />
 

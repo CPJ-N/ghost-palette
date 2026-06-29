@@ -135,7 +135,7 @@ export default function MethodologyDocsPage() {
         <h2>Put methodology into practice</h2>
         <p>Start with a fair comparison run in the Create studio.</p>
         <div className="gp-docs-cta__actions">
-          <Link className="gp-button gp-button--primary" href="/arena">
+          <Link className="gp-button gp-button--primary" href="/studio">
             Open Studio
           </Link>
           <Link className="gp-button gp-button--ghost" href="/docs/benchmarks">

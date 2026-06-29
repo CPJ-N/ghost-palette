@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   BookOpen,
   Brush,
-  GalleryHorizontalEnd,
   Library,
   LifeBuoy,
   Settings,
@@ -32,7 +31,7 @@ import {
 const workflows = [
   {
     title: "Create",
-    url: "/arena",
+    url: "/studio",
     icon: Brush,
     description: "Generate and compare images",
   },
@@ -82,11 +81,6 @@ const support = [
     icon: BookOpen,
   },
   {
-    title: "Pricing",
-    url: "/pricing",
-    icon: GalleryHorizontalEnd,
-  },
-  {
     title: "Support",
     url: "mailto:hello@ghostpalette.app",
     icon: LifeBuoy,
@@ -102,7 +96,7 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/arena" aria-label="Ghost Palette studio">
+              <Link href="/studio" aria-label="Ghost Palette studio">
                 <span className="gp-mark" aria-hidden="true">
                   GP
                 </span>

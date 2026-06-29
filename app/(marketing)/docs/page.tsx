@@ -76,7 +76,7 @@ export default function DocsIndexPage() {
           prompt, model choice when needed, and side-by-side comparison when it
           helps you decide.
         </p>
-        <Link className="gp-button gp-button--primary" href="/arena">
+        <Link className="gp-button gp-button--primary" href="/studio">
           Open Studio
         </Link>
       </section>

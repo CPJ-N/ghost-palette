@@ -4,6 +4,11 @@ const STORAGE_KEY = "gp-saved-runs";
 const CHANGE_EVENT = "gp-saved-runs-change";
 const MAX_RUNS = 40;
 
+// Cached snapshot so useSyncExternalStore receives a STABLE reference between
+// changes. Returning a freshly-sorted array on every read makes React think the
+// store changed each render → "Maximum update depth exceeded" infinite loop.
+let cachedSnapshot: SavedRun[] | null = null;
+
 function readRaw(): SavedRun[] {
   if (typeof window === "undefined") {
     return [];
@@ -20,24 +25,40 @@ function readRaw(): SavedRun[] {
   }
 }
 
+function computeSnapshot(): SavedRun[] {
+  return readRaw().sort(
+    (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
+  );
+}
+
+function invalidate() {
+  cachedSnapshot = null;
+}
+
 function writeRaw(runs: SavedRun[]) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(runs.slice(0, MAX_RUNS)));
+  invalidate();
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
 export function subscribeSavedRuns(onStoreChange: () => void) {
-  window.addEventListener(CHANGE_EVENT, onStoreChange);
-  window.addEventListener("storage", onStoreChange);
+  const handler = () => {
+    invalidate();
+    onStoreChange();
+  };
+  window.addEventListener(CHANGE_EVENT, handler);
+  window.addEventListener("storage", handler);
   return () => {
-    window.removeEventListener(CHANGE_EVENT, onStoreChange);
-    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener(CHANGE_EVENT, handler);
+    window.removeEventListener("storage", handler);
   };
 }
 
 export function loadSavedRuns(): SavedRun[] {
-  return readRaw().sort(
-    (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
-  );
+  if (cachedSnapshot === null) {
+    cachedSnapshot = computeSnapshot();
+  }
+  return cachedSnapshot;
 }
 
 export function saveRun(input: {
