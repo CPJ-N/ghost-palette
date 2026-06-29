@@ -5,13 +5,23 @@
 
 -- Per-user profile, credit balance, Stripe linkage.
 create table if not exists profiles (
-  user_id            text primary key,             -- Clerk user id
-  email              text,
-  credit_balance     integer not null default 0,
-  plan               text not null default 'free', -- free | basic | pro | enterprise
-  stripe_customer_id text,
-  created_at         timestamptz not null default now(),
-  updated_at         timestamptz not null default now()
+  user_id                text primary key,             -- Clerk user id
+  email                  text,
+  email_verified         boolean not null default false,
+  first_name             text,                         -- synced from Clerk
+  last_name              text,
+  username               text,
+  image_url              text,                         -- Clerk avatar
+  credit_balance         integer not null default 0,
+  monthly_credits        integer not null default 50,  -- reset target per period (free=50, paid=pack credits)
+  plan                   text not null default 'free', -- free | basic | pro | enterprise
+  stripe_customer_id     text,
+  stripe_subscription_id text,
+  current_period_start   timestamptz,                  -- Stripe billing period start
+  current_period_end     timestamptz,                  -- Stripe renewal date
+  next_refresh_at        timestamptz default (now() + interval '1 month'), -- monthly credit-reset anchor (cron)
+  created_at             timestamptz not null default now(),
+  updated_at             timestamptz not null default now()
 );
 
 -- Append-only credit ledger — the source of truth for balance changes.
@@ -19,7 +29,7 @@ create table if not exists credit_transactions (
   id            bigint generated always as identity primary key,
   user_id       text not null references profiles(user_id) on delete cascade,
   amount        integer not null,                  -- + grant/purchase, - spend
-  reason        text not null,                     -- signup | purchase | subscription | generation | refund | adjustment
+  reason        text not null,                     -- signup | subscription | refresh | generation | generation_refund | benchmark | benchmark_refund | adjustment
   ref           text,                              -- stripe id / run id / etc.
   balance_after integer not null,
   created_at    timestamptz not null default now()
@@ -28,6 +38,16 @@ create index if not exists credit_tx_user_idx on credit_transactions (user_id, c
 create unique index if not exists credit_tx_starter_unique_idx
   on credit_transactions (user_id)
   where reason = 'signup' and ref = 'starter';
+-- Idempotency for Stripe subscription grants: a given (reason, ref) — initial
+-- subscription id or renewal invoice id — can be granted at most once, so a
+-- re-delivered webhook event cannot double-grant credits.
+create unique index if not exists credit_tx_subscription_ref_unique_idx
+  on credit_transactions (reason, ref)
+  where reason = 'subscription' and ref is not null;
+-- Idempotency for the monthly cron refresh: one 'refresh' row per user per period.
+create unique index if not exists credit_tx_refresh_unique_idx
+  on credit_transactions (user_id, ref)
+  where reason = 'refresh' and ref is not null;
 
 -- Atomic credit mutation used by the server-side service-role client.
 -- Public/anon clients must not execute this; all credit changes go through API routes.
@@ -70,6 +90,89 @@ $$;
 
 revoke all on function adjust_credits(text, integer, text, text) from public;
 grant execute on function adjust_credits(text, integer, text, text) to service_role;
+
+-- Idempotent reset: SET the balance to a target, log the delta, optionally advance
+-- the monthly refresh anchor. A duplicate (reason, ref) INSERT raises 23505 and
+-- rolls back the whole function, so a re-delivered webhook never re-resets.
+create or replace function set_credits(
+  p_user_id text,
+  p_target integer,
+  p_reason text,
+  p_ref text default null,
+  p_advance_refresh boolean default false
+) returns integer
+language plpgsql
+as $$
+declare
+  v_old integer;
+begin
+  if p_target < 0 then
+    raise exception 'target_must_not_be_negative' using errcode = 'P0001';
+  end if;
+
+  select credit_balance into v_old from profiles where user_id = p_user_id for update;
+  if not found then
+    raise exception 'profile_not_found' using errcode = 'P0002';
+  end if;
+
+  update profiles
+     set credit_balance = p_target,
+         next_refresh_at = case
+           when p_advance_refresh then now() + interval '1 month'
+           else next_refresh_at
+         end,
+         updated_at = now()
+   where user_id = p_user_id;
+
+  insert into credit_transactions (user_id, amount, reason, ref, balance_after)
+  values (p_user_id, p_target - v_old, p_reason, p_ref, p_target);
+
+  return p_target;
+end;
+$$;
+
+revoke all on function set_credits(text, integer, text, text, boolean) from public;
+grant execute on function set_credits(text, integer, text, text, boolean) to service_role;
+
+-- Monthly reset engine for the Vercel cron: reset every due profile's balance to
+-- its monthly_credits, advance next_refresh_at by a month, and log a 'refresh' row.
+-- Idempotent via the next_refresh_at gate + the per-period unique index.
+create or replace function refresh_due_credits() returns integer
+language plpgsql
+as $$
+declare
+  v_count integer;
+begin
+  with due as (
+    select user_id, monthly_credits, credit_balance as old_balance
+    from profiles
+    where next_refresh_at is not null and next_refresh_at <= now()
+    for update skip locked
+  ),
+  upd as (
+    update profiles p
+       set credit_balance = d.monthly_credits,
+           next_refresh_at = now() + interval '1 month',
+           updated_at = now()
+      from due d
+     where p.user_id = d.user_id
+    returning p.user_id
+  ),
+  logged as (
+    insert into credit_transactions (user_id, amount, reason, ref, balance_after)
+    select d.user_id, d.monthly_credits - d.old_balance, 'refresh',
+           to_char(now(), 'YYYY-MM'), d.monthly_credits
+    from due d
+    on conflict do nothing
+    returning 1
+  )
+  select count(*) into v_count from upd;
+  return v_count;
+end;
+$$;
+
+revoke all on function refresh_due_credits() from public;
+grant execute on function refresh_due_credits() to service_role;
 
 -- A generation batch (composer / arena / eval).
 create table if not exists runs (

@@ -10,6 +10,10 @@ import { MODELS } from "@/lib/models";
 
 import type { Metadata } from "next";
 
+// Live community data (latest VLM grades) — render per request; never prerender at
+// build, which has no DB env and would otherwise crash the build / bake a stale board.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Live Image Model Leaderboard — Ghost Palette",
   description:

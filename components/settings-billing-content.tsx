@@ -43,8 +43,10 @@ export function SettingsBillingContent() {
   const [pro, setPro] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { credits, isLoadingCredits, refreshCredits } = useCredits();
+  const { credits, isLoadingCredits } = useCredits();
   const interval: BillingInterval = annual ? "year" : "month";
+  const plan = credits?.plan ?? "free";
+  const isPaid = plan === "basic" || plan === "pro";
 
   async function startCheckout(plan: PaidPlan, credits: number) {
     const key = lookupKey(plan, credits, interval);
@@ -65,13 +67,32 @@ export function SettingsBillingContent() {
       if (!response.ok || !data.url) {
         throw new Error(data.error ?? "Checkout failed");
       }
-      await refreshCredits();
       window.location.href = data.url;
     } catch (checkoutError) {
       setError(
         checkoutError instanceof Error
           ? checkoutError.message
           : "Checkout failed",
+      );
+      setBusy(null);
+    }
+  }
+
+  async function openPortal() {
+    setBusy("portal");
+    setError(null);
+    try {
+      const response = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = (await response.json()) as { url?: string; error?: string };
+      if (!response.ok || !data.url) {
+        throw new Error(data.error ?? "Could not open billing portal");
+      }
+      window.location.href = data.url;
+    } catch (portalError) {
+      setError(
+        portalError instanceof Error
+          ? portalError.message
+          : "Could not open billing portal",
       );
       setBusy(null);
     }
@@ -100,6 +121,35 @@ export function SettingsBillingContent() {
             ? `${credits.balance.toLocaleString()} credits`
             : "unavailable"}
       </p>
+      <p className="gp-settings-copy">
+        Current plan:{" "}
+        <strong>
+          {plan === "free" ? "Free" : plan === "basic" ? "Basic" : "Pro"}
+        </strong>
+      </p>
+      {isPaid ? (
+        <div className="gp-settings-manage">
+          {credits?.currentPeriodEnd ? (
+            <p className="gp-settings-copy">
+              Renews on{" "}
+              {new Date(credits.currentPeriodEnd).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+              .
+            </p>
+          ) : null}
+          <p className="gp-settings-copy">
+            Change your plan, update payment, or cancel anytime in the billing
+            portal.
+          </p>
+          <Button onClick={openPortal} disabled={busy === "portal"}>
+            {busy === "portal" ? "Opening…" : "Manage subscription"}
+          </Button>
+        </div>
+      ) : (
+        <>
       <div className="gp-billtoggle gp-billtoggle--compact" role="group">
         <button
           type="button"
@@ -159,6 +209,8 @@ export function SettingsBillingContent() {
           </Button>
         </article>
       </div>
+        </>
+      )}
       <div className="gp-settings-actions">
         <Button asChild variant="outline">
           <Link href="/pricing">Full pricing details</Link>

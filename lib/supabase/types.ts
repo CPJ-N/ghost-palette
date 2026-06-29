@@ -1,408 +1,585 @@
-// Hand-written to mirror supabase/schema.sql. Shaped like `supabase gen types`
-// output so it can be regenerated/replaced once the tables exist:
-//   supabase gen types typescript --project-id lhkaetustgmzwfyrtdlm > lib/supabase/types.ts
-
 export type Json =
   | string
   | number
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[];
+  | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          user_id: string;
-          email: string | null;
-          credit_balance: number;
-          plan: string;
-          stripe_customer_id: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          user_id: string;
-          email?: string | null;
-          credit_balance?: number;
-          plan?: string;
-          stripe_customer_id?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          user_id?: string;
-          email?: string | null;
-          credit_balance?: number;
-          plan?: string;
-          stripe_customer_id?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      credit_transactions: {
-        Row: {
-          id: number;
-          user_id: string;
-          amount: number;
-          reason: string;
-          ref: string | null;
-          balance_after: number;
-          created_at: string;
-        };
-        Insert: {
-          id?: number;
-          user_id: string;
-          amount: number;
-          reason: string;
-          ref?: string | null;
-          balance_after: number;
-          created_at?: string;
-        };
-        Update: {
-          id?: number;
-          user_id?: string;
-          amount?: number;
-          reason?: string;
-          ref?: string | null;
-          balance_after?: number;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "credit_transactions_user_id_fkey";
-            columns: ["user_id"];
-            referencedRelation: "profiles";
-            referencedColumns: ["user_id"];
-          },
-        ];
-      };
-      runs: {
-        Row: {
-          id: string;
-          user_id: string;
-          mode: string;
-          prompt: string;
-          model_ids: Json;
-          seeds: Json | null;
-          created_at: string;
-        };
-        Insert: {
-          id: string;
-          user_id: string;
-          mode: string;
-          prompt: string;
-          model_ids: Json;
-          seeds?: Json | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          mode?: string;
-          prompt?: string;
-          model_ids?: Json;
-          seeds?: Json | null;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "runs_user_id_fkey";
-            columns: ["user_id"];
-            referencedRelation: "profiles";
-            referencedColumns: ["user_id"];
-          },
-        ];
-      };
-      results: {
-        Row: {
-          id: string;
-          run_id: string;
-          user_id: string;
-          model_id: string;
-          prompt: string;
-          seed: number | null;
-          status: string;
-          storage_path: string | null;
-          width: number | null;
-          height: number | null;
-          favorite: boolean;
-          error: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id: string;
-          run_id: string;
-          user_id: string;
-          model_id: string;
-          prompt: string;
-          seed?: number | null;
-          status?: string;
-          storage_path?: string | null;
-          width?: number | null;
-          height?: number | null;
-          favorite?: boolean;
-          error?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          run_id?: string;
-          user_id?: string;
-          model_id?: string;
-          prompt?: string;
-          seed?: number | null;
-          status?: string;
-          storage_path?: string | null;
-          width?: number | null;
-          height?: number | null;
-          favorite?: boolean;
-          error?: string | null;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "results_run_id_fkey";
-            columns: ["run_id"];
-            referencedRelation: "runs";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "results_user_id_fkey";
-            columns: ["user_id"];
-            referencedRelation: "profiles";
-            referencedColumns: ["user_id"];
-          },
-        ];
-      };
-      evals: {
-        Row: {
-          id: string;
-          user_id: string;
-          run_id: string | null;
-          prompt: string;
-          reference_kind: string;
-          reference_path: string;
-          reference_result_id: string | null;
-          scorer: string;
-          created_at: string;
-        };
-        Insert: {
-          id: string;
-          user_id: string;
-          run_id?: string | null;
-          prompt: string;
-          reference_kind: string;
-          reference_path: string;
-          reference_result_id?: string | null;
-          scorer?: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          run_id?: string | null;
-          prompt?: string;
-          reference_kind?: string;
-          reference_path?: string;
-          reference_result_id?: string | null;
-          scorer?: string;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "evals_user_id_fkey";
-            columns: ["user_id"];
-            referencedRelation: "profiles";
-            referencedColumns: ["user_id"];
-          },
-          {
-            foreignKeyName: "evals_run_id_fkey";
-            columns: ["run_id"];
-            referencedRelation: "runs";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      eval_scores: {
-        Row: {
-          id: number;
-          eval_id: string;
-          result_id: string;
-          user_id: string;
-          score: number;
-          raw: Json | null;
-          rank: number | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: number;
-          eval_id: string;
-          result_id: string;
-          user_id: string;
-          score: number;
-          raw?: Json | null;
-          rank?: number | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: number;
-          eval_id?: string;
-          result_id?: string;
-          user_id?: string;
-          score?: number;
-          raw?: Json | null;
-          rank?: number | null;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "eval_scores_eval_id_fkey";
-            columns: ["eval_id"];
-            referencedRelation: "evals";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "eval_scores_result_id_fkey";
-            columns: ["result_id"];
-            referencedRelation: "results";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      benchmark_suite_runs: {
-        Row: {
-          id: string;
-          user_id: string;
-          model_id: string;
-          suite_version: string;
-          status: string;
-          pass_count: number;
-          fail_count: number;
-          total_challenges: number;
-          category_filter: string | null;
-          created_at: string;
-          completed_at: string | null;
-        };
-        Insert: {
-          id: string;
-          user_id: string;
-          model_id: string;
-          suite_version?: string;
-          status?: string;
-          pass_count?: number;
-          fail_count?: number;
-          total_challenges: number;
-          category_filter?: string | null;
-          created_at?: string;
-          completed_at?: string | null;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          model_id?: string;
-          suite_version?: string;
-          status?: string;
-          pass_count?: number;
-          fail_count?: number;
-          total_challenges?: number;
-          category_filter?: string | null;
-          created_at?: string;
-          completed_at?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "benchmark_suite_runs_user_id_fkey";
-            columns: ["user_id"];
-            referencedRelation: "profiles";
-            referencedColumns: ["user_id"];
-          },
-        ];
-      };
       benchmark_challenge_results: {
         Row: {
-          id: string;
-          suite_run_id: string;
-          user_id: string;
-          challenge_id: string;
-          model_id: string;
-          category: string;
-          image_url: string | null;
-          passed: boolean | null;
-          vlm_output: string | null;
-          latency_ms: number | null;
-          created_at: string;
-        };
+          category: string
+          challenge_id: string
+          created_at: string
+          id: string
+          image_url: string | null
+          latency_ms: number | null
+          model_id: string
+          passed: boolean | null
+          suite_run_id: string
+          user_id: string
+          vlm_output: string | null
+        }
         Insert: {
-          id: string;
-          suite_run_id: string;
-          user_id: string;
-          challenge_id: string;
-          model_id: string;
-          category: string;
-          image_url?: string | null;
-          passed?: boolean | null;
-          vlm_output?: string | null;
-          latency_ms?: number | null;
-          created_at?: string;
-        };
+          category: string
+          challenge_id: string
+          created_at?: string
+          id: string
+          image_url?: string | null
+          latency_ms?: number | null
+          model_id: string
+          passed?: boolean | null
+          suite_run_id: string
+          user_id: string
+          vlm_output?: string | null
+        }
         Update: {
-          id?: string;
-          suite_run_id?: string;
-          user_id?: string;
-          challenge_id?: string;
-          model_id?: string;
-          category?: string;
-          image_url?: string | null;
-          passed?: boolean | null;
-          vlm_output?: string | null;
-          latency_ms?: number | null;
-          created_at?: string;
-        };
+          category?: string
+          challenge_id?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          latency_ms?: number | null
+          model_id?: string
+          passed?: boolean | null
+          suite_run_id?: string
+          user_id?: string
+          vlm_output?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "benchmark_challenge_results_suite_run_id_fkey";
-            columns: ["suite_run_id"];
-            referencedRelation: "benchmark_suite_runs";
-            referencedColumns: ["id"];
+            foreignKeyName: "benchmark_challenge_results_suite_run_id_fkey"
+            columns: ["suite_run_id"]
+            isOneToOne: false
+            referencedRelation: "benchmark_suite_runs"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "benchmark_challenge_results_user_id_fkey";
-            columns: ["user_id"];
-            referencedRelation: "profiles";
-            referencedColumns: ["user_id"];
+            foreignKeyName: "benchmark_challenge_results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
           },
-        ];
-      };
-    };
-    Views: Record<string, never>;
+        ]
+      }
+      benchmark_suite_runs: {
+        Row: {
+          category_filter: string | null
+          completed_at: string | null
+          created_at: string
+          fail_count: number
+          id: string
+          model_id: string
+          pass_count: number
+          status: string
+          suite_version: string
+          total_challenges: number
+          user_id: string
+        }
+        Insert: {
+          category_filter?: string | null
+          completed_at?: string | null
+          created_at?: string
+          fail_count?: number
+          id: string
+          model_id: string
+          pass_count?: number
+          status?: string
+          suite_version?: string
+          total_challenges: number
+          user_id: string
+        }
+        Update: {
+          category_filter?: string | null
+          completed_at?: string | null
+          created_at?: string
+          fail_count?: number
+          id?: string
+          model_id?: string
+          pass_count?: number
+          status?: string
+          suite_version?: string
+          total_challenges?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "benchmark_suite_runs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      credit_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          id: number
+          reason: string
+          ref: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          id?: never
+          reason: string
+          ref?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          id?: never
+          reason?: string
+          ref?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      eval_scores: {
+        Row: {
+          created_at: string
+          eval_id: string
+          id: number
+          rank: number | null
+          raw: Json | null
+          result_id: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          eval_id: string
+          id?: never
+          rank?: number | null
+          raw?: Json | null
+          result_id: string
+          score: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          eval_id?: string
+          id?: never
+          rank?: number | null
+          raw?: Json | null
+          result_id?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eval_scores_eval_id_fkey"
+            columns: ["eval_id"]
+            isOneToOne: false
+            referencedRelation: "evals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eval_scores_result_id_fkey"
+            columns: ["result_id"]
+            isOneToOne: false
+            referencedRelation: "results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eval_scores_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      evals: {
+        Row: {
+          created_at: string
+          id: string
+          prompt: string
+          reference_kind: string
+          reference_path: string
+          reference_result_id: string | null
+          run_id: string | null
+          scorer: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          prompt: string
+          reference_kind: string
+          reference_path: string
+          reference_result_id?: string | null
+          run_id?: string | null
+          scorer?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prompt?: string
+          reference_kind?: string
+          reference_path?: string
+          reference_result_id?: string | null
+          run_id?: string | null
+          scorer?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evals_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          credit_balance: number
+          current_period_end: string | null
+          current_period_start: string | null
+          email: string | null
+          email_verified: boolean
+          first_name: string | null
+          image_url: string | null
+          last_name: string | null
+          monthly_credits: number
+          next_refresh_at: string | null
+          plan: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          credit_balance?: number
+          current_period_end?: string | null
+          current_period_start?: string | null
+          email?: string | null
+          email_verified?: boolean
+          first_name?: string | null
+          image_url?: string | null
+          last_name?: string | null
+          monthly_credits?: number
+          next_refresh_at?: string | null
+          plan?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          credit_balance?: number
+          current_period_end?: string | null
+          current_period_start?: string | null
+          email?: string | null
+          email_verified?: boolean
+          first_name?: string | null
+          image_url?: string | null
+          last_name?: string | null
+          monthly_credits?: number
+          next_refresh_at?: string | null
+          plan?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      results: {
+        Row: {
+          created_at: string
+          error: string | null
+          favorite: boolean
+          height: number | null
+          id: string
+          model_id: string
+          prompt: string
+          run_id: string
+          seed: number | null
+          status: string
+          storage_path: string | null
+          user_id: string
+          width: number | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          favorite?: boolean
+          height?: number | null
+          id: string
+          model_id: string
+          prompt: string
+          run_id: string
+          seed?: number | null
+          status?: string
+          storage_path?: string | null
+          user_id: string
+          width?: number | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          favorite?: boolean
+          height?: number | null
+          id?: string
+          model_id?: string
+          prompt?: string
+          run_id?: string
+          seed?: number | null
+          status?: string
+          storage_path?: string | null
+          user_id?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "results_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      runs: {
+        Row: {
+          created_at: string
+          id: string
+          mode: string
+          model_ids: Json
+          prompt: string
+          seeds: Json | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          mode: string
+          model_ids: Json
+          prompt: string
+          seeds?: Json | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mode?: string
+          model_ids?: Json
+          prompt?: string
+          seeds?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "runs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
     Functions: {
       adjust_credits: {
         Args: {
-          p_user_id: string;
-          p_amount: number;
-          p_reason: string;
-          p_ref?: string | null;
-        };
-        Returns: number;
-      };
-    };
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
-  };
-};
+          p_amount: number
+          p_reason: string
+          p_ref?: string
+          p_user_id: string
+        }
+        Returns: number
+      }
+      refresh_due_credits: { Args: never; Returns: number }
+      set_credits: {
+        Args: {
+          p_advance_refresh?: boolean
+          p_reason: string
+          p_ref?: string
+          p_target: number
+          p_user_id: string
+        }
+        Returns: number
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
 
-// Convenience row aliases.
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
-export type CreditTransaction = Database["public"]["Tables"]["credit_transactions"]["Row"];
-export type Run = Database["public"]["Tables"]["runs"]["Row"];
-export type Result = Database["public"]["Tables"]["results"]["Row"];
-export type Eval = Database["public"]["Tables"]["evals"]["Row"];
-export type EvalScore = Database["public"]["Tables"]["eval_scores"]["Row"];
-export type BenchmarkSuiteRunRow =
-  Database["public"]["Tables"]["benchmark_suite_runs"]["Row"];
-export type BenchmarkChallengeResultRow =
-  Database["public"]["Tables"]["benchmark_challenge_results"]["Row"];
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const

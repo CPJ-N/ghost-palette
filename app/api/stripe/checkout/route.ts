@@ -2,7 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { apiLogger, durationMs, logUnauthorized, logValidationError } from "@/lib/api-log";
-import { ensureProfile } from "@/lib/credits";
+import { ensureProfile, getStripeCustomerId } from "@/lib/credits";
 import { packByLookupKey } from "@/lib/stripe/catalog";
 import { stripe } from "@/lib/stripe/server";
 
@@ -47,6 +47,37 @@ export async function POST(request: Request) {
   const email = user?.primaryEmailAddress?.emailAddress ?? undefined;
   await ensureProfile(userId, email);
 
+  // Reuse the stored Stripe customer so repeat/upgrade checkouts don't mint a
+  // duplicate customer; fall back to email for a user's first subscription.
+  const existingCustomer = await getStripeCustomerId(userId).catch(() => null);
+
+  // Guard against a second concurrent subscription: an existing subscriber must
+  // change plans via the billing portal, not a fresh Checkout (which would
+  // double-bill). Cancelled/incomplete subs don't block a new signup.
+  if (existingCustomer) {
+    const subs = await stripe().subscriptions.list({
+      customer: existingCustomer,
+      status: "all",
+      limit: 10,
+    });
+    const hasLiveSub = subs.data.some((s) =>
+      ["active", "trialing", "past_due", "unpaid"].includes(s.status),
+    );
+    if (hasLiveSub) {
+      log.info("checkout.blocked_existing_subscription", {
+        lookupKey: pack.lookupKey,
+      });
+      return NextResponse.json(
+        {
+          error:
+            "You already have an active subscription. Change or cancel it from the billing portal.",
+          code: "subscription_exists",
+        },
+        { status: 409 },
+      );
+    }
+  }
+
   const origin =
     request.headers.get("origin") ??
     process.env.NEXT_PUBLIC_APP_URL ??
@@ -57,7 +88,9 @@ export async function POST(request: Request) {
     mode: "subscription",
     line_items: [{ price: price.id, quantity: 1 }],
     client_reference_id: userId,
-    customer_email: email,
+    ...(existingCustomer
+      ? { customer: existingCustomer }
+      : { customer_email: email }),
     metadata: {
       userId,
       plan: pack.plan,

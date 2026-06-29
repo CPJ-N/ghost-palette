@@ -5,6 +5,9 @@ import { useCallback, useEffect, useState } from "react";
 export type CreditSummary = {
   balance: number;
   plan: string;
+  monthlyCredits: number;
+  currentPeriodEnd: string | null;
+  nextRefreshAt: string | null;
   creditPriceCents: number;
   creditsPerUsd: number;
   starterCredits: number;
