@@ -5,6 +5,8 @@ export type GeneratedImage = {
   width?: number;
   height?: number;
   seed?: number;
+  creditsCharged?: number;
+  creditsBalance?: number;
 };
 
 export async function generateOne(

@@ -1,34 +1,43 @@
 # Ghost Palette
 
-Ghost Palette is an open-source image generation comparison app.
+Ghost Palette is a model-smart image generation studio.
 
-The app gives users one prompt box, a model selector, local provider-key setup,
-and a side-by-side output grid so they can compare which image model handled the
-same prompt best.
+The app lets users generate AI images, compare leading models side by side when
+the model choice matters, refine from references, save winning outputs, and use
+benchmark data to understand which model fits a job.
 
 ## MVP
 
-- Prompt input
-- Multi-model selector
-- Local API key fields for supported providers
-- Generate a comparison grid across selected models
-- Save favorite outputs
-- Basic local generation history
-- Account sign-in via Clerk (custom-themed); no billing, database, or evaluation layer yet
+- Prompt-based image creation
+- One-or-more-model Create workflow at `/arena`
+- Server-side fal generation through `/api/generate`
+- Clerk authentication for protected workflows
+- Starter credits and per-generation credit spend
+- Blind or named model comparison
+- Winner selection
+- Reference-based Refine workspace
+- Browser-local Library for saved runs
+- Credit-based pricing and Stripe checkout
+- Supabase-backed credit/profile and benchmark persistence
+- ImageBench benchmark runner and live leaderboard
 
-## Current State
+## Product Direction
 
-This repository currently implements the frontend MVP:
+Ghost Palette is moving from comparison-only toward a general-purpose image
+studio. The wedge stays model intelligence:
 
-- A grayscale landing page with the Ghost Palette workbench below the hero
-- Nunito Sans Black wordmark styling
-- Provider key storage in `localStorage`
-- Favorites and history stored in `localStorage`
-- Deterministic placeholder image cards for the comparison flow
-- Custom-themed Clerk auth (Google + email/password) at `/sign-in` and `/sign-up`
+- Create normally when the user knows what they want
+- Compare models when the prompt is important
+- Refine from a reference when the first output is close
+- Save winners and prompt history into the Library
+- Use benchmarks and model data as practical guidance
 
-Provider API adapters are not wired yet. The generation UI is ready for real
-provider calls, but the current output cards are local placeholders.
+Credit system:
+
+- 1 credit = $0.02
+- $1 = 50 credits
+- Paid packs should preserve this exchange rate unless a discount is clearly
+  described
 
 ## Tech Stack
 
@@ -37,6 +46,9 @@ provider calls, but the current output cards are local placeholders.
 - Tailwind CSS v4
 - shadcn-style CSS variables
 - Clerk authentication (custom-themed sign-in / sign-up)
+- fal.ai image generation
+- Supabase persistence
+- Stripe checkout and webhooks
 - Lucide icons
 
 ## Getting Started
@@ -61,21 +73,10 @@ pnpm start
 
 ## Project Structure
 
-- `app/page.tsx` - main landing page and comparison workbench
+- `app/(marketing)/page.tsx` - main landing page
+- `app/(app)/arena/page.tsx` - Create workflow with model comparison
+- `app/(app)/evals/page.tsx` - Refine workspace
 - `app/globals.css` - global styles and Ghost Palette page styling
 - `tokens.css` - portable design tokens for colors, type, spacing, and motion
-- `.hallmark/` - Hallmark design preflight and project memory
-
-## Provider Roadmap
-
-The next implementation step is to replace the placeholder generation path with
-provider adapters. Each adapter should accept the shared prompt and return a
-normalised result shape for the comparison grid.
-
-Initial providers in the UI:
-
-- OpenAI Images
-- Imagen
-- Flux Pro
-- SD Large
-- Ideogram
+- `docs/product-updates-plan.md` - roadmap toward the general-purpose studio
+- `docs/launch-checklist.md` - launch operations checklist

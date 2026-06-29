@@ -8,6 +8,7 @@ export type ModelDefinition = {
   provider: Provider;
   description: string;
   adapter: string;
+  creditCost: number;
   artClass: string;
 };
 
@@ -18,6 +19,7 @@ export const MODELS: ModelDefinition[] = [
     provider: "fal",
     description: "Black Forest Labs flagship — studio-grade detail and prompt fidelity.",
     adapter: "fal-ai/flux-2-pro",
+    creditCost: 2,
     artClass: "art-flux2-pro",
   },
   {
@@ -26,6 +28,7 @@ export const MODELS: ModelDefinition[] = [
     provider: "fal",
     description: "Fast, open FLUX.2 — strong general composition for quick iteration.",
     adapter: "fal-ai/flux-2",
+    creditCost: 1,
     artClass: "art-flux2-dev",
   },
   {
@@ -34,6 +37,7 @@ export const MODELS: ModelDefinition[] = [
     provider: "fal",
     description: "Previous-gen FLUX — a softer, more painterly interpretation.",
     adapter: "fal-ai/flux/dev",
+    creditCost: 2,
     artClass: "art-flux1-dev",
   },
   {
@@ -42,6 +46,7 @@ export const MODELS: ModelDefinition[] = [
     provider: "fal",
     description: "Stability's open baseline — a broad, illustrative style range.",
     adapter: "fal-ai/stable-diffusion-v35-large",
+    creditCost: 4,
     artClass: "art-sd35",
   },
   {
@@ -50,6 +55,7 @@ export const MODELS: ModelDefinition[] = [
     provider: "fal",
     description: "Design-oriented model — clean graphic and product looks.",
     adapter: "fal-ai/recraft-v3",
+    creditCost: 2,
     artClass: "art-recraft",
   },
 ];

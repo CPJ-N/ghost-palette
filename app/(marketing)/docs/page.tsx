@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Docs — Ghost Palette",
   description:
-    "Documentation for Ghost Palette — live ImageBench scores, industry benchmarks, and evaluation methodology.",
+    "Documentation for Ghost Palette — image generation workflows, model scores, benchmarks, and evaluation methodology.",
 };
 
 const SECTIONS = [
@@ -47,12 +47,12 @@ export default function DocsIndexPage() {
     <article className="gp-docs-page">
       <header className="gp-docs-page__hero">
         <p className="gp-kicker">Documentation</p>
-        <h1>Image model evaluation</h1>
+        <h1>Image studio and model intelligence</h1>
         <p className="gp-docs-page__lede">
-          Ghost Palette measures models two ways: live ImageBench scores produced
-          on our stack, and curated industry reference data from public
-          leaderboards. These docs explain both — plus how to compare models on
-          your own prompts in the app.
+          Ghost Palette is a creation workspace first, with model comparison and
+          benchmark data built in. These docs explain the workflows, the live
+          ImageBench scores produced on our stack, and public reference data
+          from industry leaderboards.
         </p>
       </header>
 
@@ -70,13 +70,14 @@ export default function DocsIndexPage() {
       </section>
 
       <section className="gp-docs-cta">
-        <h2>Compare on your prompts</h2>
+        <h2>Create on your prompts</h2>
         <p>
-          Benchmarks answer fixed suites. Arena answers your brief — same
-          prompt across every model in one comparison grid.
+          Benchmarks answer fixed suites. The Studio answers your brief — one
+          prompt, model choice when needed, and side-by-side comparison when it
+          helps you decide.
         </p>
         <Link className="gp-button gp-button--primary" href="/arena">
-          Open Arena
+          Open Studio
         </Link>
       </section>
     </article>

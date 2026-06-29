@@ -54,3 +54,4 @@ grid currently shows designed placeholders (being replaced with real fal.ai imag
   CAPTCHA ON — custom flows must mount `<div id="clerk-captcha">` (sign-up + sso-callback).
 - A separate "Tashvi Design Studio" project can leave a service worker on `localhost:3000`;
   use a fresh port or clear site data if the browser shows the wrong app.
+- Never add `Co-authored-by: Claude` or any Claude co-author trailer to commits.

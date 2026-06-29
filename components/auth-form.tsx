@@ -3,7 +3,7 @@
 import { useSignIn, useSignUp } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { AuthBackdrop } from "@/components/auth-backdrop";
@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 
 type Mode = "sign-in" | "sign-up";
+type OAuthProvider = "oauth_google" | "oauth_apple";
 
 function GoogleGlyph() {
   return (
@@ -21,6 +22,17 @@ function GoogleGlyph() {
       <path
         fill="currentColor"
         d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+      />
+    </svg>
+  );
+}
+
+function AppleGlyph() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M16.365 1.43c0 1.14-.42 2.18-1.26 3.12-.98 1.1-2.12 1.73-3.31 1.63-.14-1.1.42-2.3 1.18-3.15.84-.95 2.28-1.64 3.39-1.6Zm3.6 16.84c-.55 1.27-.82 1.84-1.53 2.96-.99 1.51-2.38 3.39-4.1 3.41-1.53.02-1.93-.99-4.01-.98-2.08.01-2.52 1-4.05.98-1.72-.02-3.03-1.71-4.02-3.22-2.77-4.24-3.06-9.21-1.35-11.85 1.22-1.88 3.15-2.98 4.96-2.98 1.84 0 3 .99 4.52.99 1.47 0 2.37-.99 4.5-.99 1.61 0 3.32.88 4.53 2.39-3.98 2.18-3.33 7.86.55 9.29Z"
       />
     </svg>
   );
@@ -49,8 +61,25 @@ function Divider() {
   );
 }
 
+function redirectTarget(value: string | null, currentOrigin?: string | null): string {
+  if (!value) return "/";
+  if (value.startsWith("/")) return value;
+
+  try {
+    const url = new URL(value);
+    if (currentOrigin && url.origin === currentOrigin) {
+      return `${url.pathname}${url.search}${url.hash}`;
+    }
+  } catch {
+    return "/";
+  }
+
+  return "/";
+}
+
 export function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signIn } = useSignIn();
   const { signUp } = useSignUp();
 
@@ -62,12 +91,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const [error, setError] = useState<string | null>(null);
 
   const isSignUp = mode === "sign-up";
+  const currentOrigin =
+    typeof window === "undefined" ? null : window.location.origin;
+  const afterAuthUrl = redirectTarget(searchParams.get("redirect_url"), currentOrigin);
 
-  async function handleGoogle() {
+  async function handleSSO(strategy: OAuthProvider) {
     setError(null);
     const ssoParams = {
-      strategy: "oauth_google" as const,
-      redirectUrl: "/sso-callback",
+      strategy,
+      redirectUrl: afterAuthUrl,
       redirectCallbackUrl: "/sso-callback",
     };
     try {
@@ -120,7 +152,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           setError(readClerkError(finalizeError));
           return;
         }
-        router.push("/");
+        router.push(afterAuthUrl);
       }
     } catch (err) {
       setError(readClerkError(err));
@@ -150,7 +182,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         setError(readClerkError(finalizeError));
         return;
       }
-      router.push("/");
+      router.push(afterAuthUrl);
     } catch (err) {
       setError(readClerkError(err));
     } finally {
@@ -226,11 +258,21 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 type="button"
                 variant="outline"
                 className="w-full"
-                onClick={handleGoogle}
+                onClick={() => handleSSO("oauth_google")}
                 disabled={submitting}
               >
                 <GoogleGlyph />
                 Continue with Google
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => handleSSO("oauth_apple")}
+                disabled={submitting}
+              >
+                <AppleGlyph />
+                Continue with Apple
               </Button>
 
               <Divider />

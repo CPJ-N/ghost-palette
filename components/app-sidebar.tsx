@@ -4,12 +4,12 @@ import type { ComponentProps } from "react";
 import Link from "next/link";
 import {
   BookOpen,
+  Brush,
   GalleryHorizontalEnd,
   Library,
   LifeBuoy,
   Settings,
   SlidersHorizontal,
-  Swords,
   Trophy,
   FlaskConical,
 } from "lucide-react";
@@ -31,16 +31,16 @@ import {
 
 const workflows = [
   {
-    title: "Arena",
+    title: "Create",
     url: "/arena",
-    icon: Swords,
-    description: "Compare models head-to-head",
+    icon: Brush,
+    description: "Generate and compare images",
   },
   {
     title: "Refine",
     url: "/evals",
     icon: SlidersHorizontal,
-    description: "Edit and compare",
+    description: "Edit from a reference",
   },
 ];
 
@@ -102,14 +102,14 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/leaderboard" aria-label="Ghost Palette evaluation">
+              <Link href="/arena" aria-label="Ghost Palette studio">
                 <span className="gp-mark" aria-hidden="true">
                   GP
                 </span>
                 <span className="grid flex-1 text-left leading-tight">
                   <span className="truncate font-semibold">Ghost Palette</span>
                   <span className="truncate text-xs text-muted-foreground">
-                    Model evaluation
+                    Image studio
                   </span>
                 </span>
               </Link>
@@ -118,15 +118,15 @@ export function AppSidebar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain label="Benchmarks" items={evaluation.slice(0, 3)} />
-        <NavMain label="Workbench" items={workflows} />
+        <NavMain label="Studio" items={workflows} />
+        <NavMain label="Model intelligence" items={evaluation.slice(0, 3)} />
         <NavMain label="Workspace" items={evaluation.slice(3)} />
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
             <div className="gp-sidebar-note">
               <p>
-                Run ImageBench on GP models, track live pass rates, and compare
-                against industry reference data.
+                Create images first. Use scores and benchmarks when the model
+                choice matters.
               </p>
             </div>
           </SidebarGroupContent>

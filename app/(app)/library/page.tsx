@@ -5,6 +5,13 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 
 import {
+  Card,
+  CardContent,
+  CardHeader,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
   deleteSavedRun,
   loadSavedRuns,
   subscribeSavedRuns,
@@ -14,7 +21,7 @@ import type { SavedRun } from "@/lib/types";
 
 const MODE_LABEL: Record<SavedRun["mode"], string> = {
   composer: "Composer",
-  arena: "Arena",
+  arena: "Create",
   eval: "Refine",
 };
 
@@ -35,19 +42,20 @@ export default function LibraryPage() {
   return (
     <div className="gp-feature">
       <header className="gp-feature__head">
-        <span className="gp-tag">Library</span>
-        <h1>Saved evaluations</h1>
+        <Badge variant="secondary" className="gp-tag">
+          Library
+        </Badge>
+        <h1>Saved images and model picks</h1>
         <p>
-          Arena winners and refinement comparisons you save
-          appear here. Runs stay in this browser until Supabase persistence
-          ships.
+          Studio winners and refinement outputs you save appear here. Runs stay
+          in this browser until Supabase persistence ships.
         </p>
       </header>
 
       {runs.length === 0 ? (
         <div className="gp-listempty">
-          Nothing saved yet. Compare in{" "}
-          <Link href="/arena">Arena</Link> or{" "}
+          Nothing saved yet. Generate in{" "}
+          <Link href="/arena">Create</Link> or{" "}
           <Link href="/evals">Refine</Link>, then use Save to Library.
         </div>
       ) : (
@@ -56,10 +64,12 @@ export default function LibraryPage() {
             const winner = run.results.find((result) => result.id === run.winnerId);
             const thumbs = run.results.filter((result) => result.status === "complete");
             return (
-              <article className="gp-library__item" key={run.id}>
-                <header className="gp-library__head">
+              <Card className="gp-library__item" key={run.id}>
+                <CardHeader className="gp-library__head">
                   <div>
-                    <span className="gp-tag">{MODE_LABEL[run.mode]}</span>
+                    <Badge variant="secondary" className="gp-tag">
+                      {MODE_LABEL[run.mode]}
+                    </Badge>
                     <h2>{run.prompt}</h2>
                     <p>
                       Saved {formatWhen(run.savedAt)} · {thumbs.length} image
@@ -67,7 +77,9 @@ export default function LibraryPage() {
                       {winner ? ` · Winner: ${getModel(winner.modelId).name}` : ""}
                     </p>
                   </div>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="lg"
                     className="gp-button gp-button--ghost gp-library__delete"
                     type="button"
                     onClick={() => deleteSavedRun(run.id)}
@@ -75,9 +87,9 @@ export default function LibraryPage() {
                   >
                     <Trash2 size={16} aria-hidden="true" />
                     Delete
-                  </button>
-                </header>
-                <div className="gp-library__grid">
+                  </Button>
+                </CardHeader>
+                <CardContent className="gp-library__grid">
                   {thumbs.map((result) => {
                     const model = getModel(result.modelId);
                     const isWinner = result.id === run.winnerId;
@@ -102,8 +114,8 @@ export default function LibraryPage() {
                       </figure>
                     );
                   })}
-                </div>
-              </article>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

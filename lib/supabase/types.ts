@@ -379,7 +379,17 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      adjust_credits: {
+        Args: {
+          p_user_id: string;
+          p_amount: number;
+          p_reason: string;
+          p_ref?: string | null;
+        };
+        Returns: number;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

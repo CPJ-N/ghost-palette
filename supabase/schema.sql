@@ -25,6 +25,51 @@ create table if not exists credit_transactions (
   created_at    timestamptz not null default now()
 );
 create index if not exists credit_tx_user_idx on credit_transactions (user_id, created_at desc);
+create unique index if not exists credit_tx_starter_unique_idx
+  on credit_transactions (user_id)
+  where reason = 'signup' and ref = 'starter';
+
+-- Atomic credit mutation used by the server-side service-role client.
+-- Public/anon clients must not execute this; all credit changes go through API routes.
+create or replace function adjust_credits(
+  p_user_id text,
+  p_amount integer,
+  p_reason text,
+  p_ref text default null
+) returns integer
+language plpgsql
+as $$
+declare
+  v_balance integer;
+begin
+  if p_amount = 0 then
+    raise exception 'amount_must_not_be_zero' using errcode = 'P0001';
+  end if;
+
+  update profiles
+     set credit_balance = credit_balance + p_amount,
+         updated_at = now()
+   where user_id = p_user_id
+     and (p_amount > 0 or credit_balance + p_amount >= 0)
+   returning credit_balance into v_balance;
+
+  if v_balance is null then
+    if exists (select 1 from profiles where user_id = p_user_id) then
+      raise exception 'insufficient_credits' using errcode = 'P0001';
+    end if;
+
+    raise exception 'profile_not_found' using errcode = 'P0002';
+  end if;
+
+  insert into credit_transactions (user_id, amount, reason, ref, balance_after)
+  values (p_user_id, p_amount, p_reason, p_ref, v_balance);
+
+  return v_balance;
+end;
+$$;
+
+revoke all on function adjust_credits(text, integer, text, text) from public;
+grant execute on function adjust_credits(text, integer, text, text) to service_role;
 
 -- A generation batch (composer / arena / eval).
 create table if not exists runs (

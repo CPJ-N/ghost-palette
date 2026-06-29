@@ -24,7 +24,7 @@ const nunitoSans = Nunito_Sans({
 export const metadata: Metadata = {
   title: "Ghost Palette",
   description:
-    "The evaluation layer for AI image models — generate with every model and prove which one wins against your reference.",
+    "The model-smart image studio for generating, comparing, refining, and saving AI images.",
 };
 
 export default function RootLayout({

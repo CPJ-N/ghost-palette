@@ -8,7 +8,12 @@ import { useState } from "react";
 
 import { MarketingNav } from "@/components/marketing-nav";
 import { SiteFooter } from "@/components/site-footer";
-import type { BillingInterval, PaidPlan } from "@/lib/stripe/catalog";
+import {
+  CREDIT_PRICE_CENTS,
+  CREDITS_PER_USD,
+  type BillingInterval,
+  type PaidPlan,
+} from "@/lib/stripe/catalog";
 
 const BASIC_OPTIONS = [
   { credits: 1000, price: 20 },
@@ -84,8 +89,12 @@ export default function PricingPage() {
         <div className="gp-pricing__head">
           <h1 id="pricing-title">Credit-based pricing</h1>
           <p>
-            Every plan includes Arena and Refine. Credits are spent per
-            generation — pick the volume you need, scale anytime.
+            Every plan includes Create, Compare, and Refine. Credits are spent
+            per generation — pick the volume you need, scale anytime.
+          </p>
+          <p>
+            <strong>1 credit = {CREDIT_PRICE_CENTS} cents.</strong> $1 buys{" "}
+            {CREDITS_PER_USD} credits.
           </p>
           {error ? <p className="gp-pricing__error">{error}</p> : null}
           <div className="gp-billtoggle" role="group" aria-label="Billing period">
@@ -119,7 +128,7 @@ export default function PricingPage() {
                 <Check size={16} aria-hidden="true" /> 50 credits / month
               </li>
               <li>
-                <Check size={16} aria-hidden="true" /> Image Arena
+                <Check size={16} aria-hidden="true" /> Create studio
               </li>
               <li>
                 <Check size={16} aria-hidden="true" /> All five models
@@ -155,7 +164,7 @@ export default function PricingPage() {
             <p className="gp-plan__inherit">Everything in Free, plus</p>
             <ul className="gp-plan__features">
               <li>
-                <Check size={16} aria-hidden="true" /> Refinement scoring
+                <Check size={16} aria-hidden="true" /> Refinement workspace
               </li>
               <li>
                 <Check size={16} aria-hidden="true" /> Saved Library
@@ -203,7 +212,7 @@ export default function PricingPage() {
             <p className="gp-plan__inherit">Everything in Basic, plus</p>
             <ul className="gp-plan__features">
               <li>
-                <Check size={16} aria-hidden="true" /> Multi-model arena runs
+                <Check size={16} aria-hidden="true" /> Multi-model comparison runs
               </li>
               <li>
                 <Check size={16} aria-hidden="true" /> Faster generation

@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Evaluation Methodology — Ghost Palette Docs",
   description:
-    "How Ghost Palette runs fair image model comparisons — Arena and Refine workflows aligned with industry benchmark practices.",
+    "How Ghost Palette runs fair image model comparisons — Create and Refine workflows aligned with industry benchmark practices.",
 };
 
 const FAIR_RUN_RULES = [
@@ -32,9 +32,9 @@ const FAIR_RUN_RULES = [
 
 const WORKFLOWS = [
   {
-    title: "Arena",
+    title: "Create",
     metric: "Human preference",
-    body: "Run one prompt across every model, compare outputs side by side, and pick a winner — blind or named. Mirrors Arena.ai and Artificial Analysis.",
+    body: "Run one prompt across multiple models, compare outputs side by side, and pick a winner — blind or named. Mirrors Arena.ai and Artificial Analysis.",
   },
   {
     title: "Refine",
@@ -92,7 +92,8 @@ export default function MethodologyDocsPage() {
       <section className="gp-docs-section" aria-labelledby="workflows-title">
         <h2 id="workflows-title">Workflow mapping</h2>
         <p className="gp-docs-section__lede">
-          Each Ghost Palette workflow targets a different evaluation dimension.
+          Each Ghost Palette workflow targets a different creation and evaluation
+          dimension.
         </p>
         <div className="gp-docs-workflows">
           {WORKFLOWS.map((wf) => (
@@ -132,10 +133,10 @@ export default function MethodologyDocsPage() {
 
       <section className="gp-docs-cta">
         <h2>Put methodology into practice</h2>
-        <p>Start with a fair comparison run in the Image Arena.</p>
+        <p>Start with a fair comparison run in the Create studio.</p>
         <div className="gp-docs-cta__actions">
           <Link className="gp-button gp-button--primary" href="/arena">
-            Open Arena
+            Open Studio
           </Link>
           <Link className="gp-button gp-button--ghost" href="/docs/benchmarks">
             View benchmarks

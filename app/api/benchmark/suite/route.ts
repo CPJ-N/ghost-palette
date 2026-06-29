@@ -6,6 +6,7 @@ import {
   createSuiteRun,
   finalizeSuiteRun,
 } from "@/lib/benchmark-store";
+import { ensureProfile } from "@/lib/credits";
 import { createId } from "@/lib/domain";
 import { filterChallenges } from "@/lib/imagebench";
 
@@ -35,6 +36,15 @@ export async function POST(request: Request) {
   if (!modelId) {
     logValidationError(log, "missing_model_id");
     return NextResponse.json({ error: "modelId required" }, { status: 400 });
+  }
+
+  try {
+    await ensureProfile(userId);
+  } catch (error) {
+    log.error("suite.profile_failed", error, { latencyMs: durationMs(started) });
+    const message =
+      error instanceof Error ? error.message : "Failed to prepare account";
+    return NextResponse.json({ error: message }, { status: 503 });
   }
 
   const challenges = filterChallenges({
@@ -108,6 +118,15 @@ export async function PATCH(request: Request) {
   if (!body.suiteRunId) {
     logValidationError(log, "missing_suite_run_id");
     return NextResponse.json({ error: "suiteRunId required" }, { status: 400 });
+  }
+
+  try {
+    await ensureProfile(userId);
+  } catch (error) {
+    log.error("suite.profile_failed", error, { latencyMs: durationMs(started) });
+    const message =
+      error instanceof Error ? error.message : "Failed to prepare account";
+    return NextResponse.json({ error: message }, { status: 503 });
   }
 
   const runLog = log.child({

@@ -12,28 +12,28 @@ export function SiteFooter() {
             <span>Ghost Palette</span>
           </Link>
           <p>
-            Compare, benchmark, and evaluate image models — live ImageBench
-            scores and industry reference data in one place.
+            Create, compare, and refine AI images with model scores and
+            benchmark data close at hand.
           </p>
           <Link
             className="gp-button gp-button--ghost gp-sitefooter__cta"
             href="/leaderboard"
           >
-            View live scores
+            View model scores
           </Link>
         </div>
 
         <nav className="gp-sitefooter__cols" aria-label="Footer">
           <div>
-            <p>Evaluate</p>
-            <Link href="/leaderboard">Live leaderboard</Link>
-            <Link href="/benchmark">Run suite</Link>
-            <Link href="/docs/benchmarks">Industry benchmarks</Link>
+            <p>Model intelligence</p>
+            <Link href="/leaderboard">Model scores</Link>
+            <Link href="/benchmark">Benchmarks</Link>
+            <Link href="/docs/benchmarks">Model data</Link>
             <Link href="/docs/methodology">Methodology</Link>
           </div>
           <div>
-            <p>Workbench</p>
-            <Link href="/arena">Arena</Link>
+            <p>Studio</p>
+            <Link href="/arena">Create</Link>
             <Link href="/evals">Refine</Link>
             <Link href="/library">Library</Link>
           </div>

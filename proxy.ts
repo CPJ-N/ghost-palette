@@ -11,6 +11,7 @@ const isProtected = createRouteMatcher([
 
 // Generation APIs only (benchmark suite runs generate + grade images).
 const isProtectedApi = createRouteMatcher([
+  "/api/credits(.*)",
   "/api/generate(.*)",
   "/api/benchmark/(.*)",
   "/api/stripe/checkout(.*)",

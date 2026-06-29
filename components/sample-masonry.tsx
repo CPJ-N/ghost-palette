@@ -29,12 +29,12 @@ export function SampleMasonry() {
   return (
     <section className="gp-gallery" id="gallery" aria-labelledby="gallery-title">
       <div className="gp-gallery__head">
-        <p className="gp-kicker">The evaluation gallery</p>
-        <h2 id="gallery-title">Every model on one wall. Pick the best.</h2>
+        <p className="gp-kicker">The studio gallery</p>
+        <h2 id="gallery-title">One brief can become five different directions.</h2>
         <p>
-          Real outputs from FLUX.2, FLUX.1, SD&nbsp;3.5 and Recraft — the same brief,
-          judged side by side. This is the question Ghost Palette answers: which model
-          actually wins?
+          Real outputs from FLUX.2, FLUX.1, SD&nbsp;3.5 and Recraft — the same
+          brief, generated side by side so you can choose the image and the
+          model with confidence.
         </p>
       </div>
 

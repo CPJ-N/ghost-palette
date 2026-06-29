@@ -7,18 +7,19 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV_LINKS = [
-  { href: "/leaderboard", label: "Live scores" },
-  { href: "/benchmark", label: "Run suite" },
-  { href: "/docs/benchmarks", label: "Industry" },
+  { href: "/leaderboard", label: "Model scores" },
+  { href: "/benchmark", label: "Benchmarks" },
+  { href: "/docs/benchmarks", label: "Model data" },
   { href: "/docs", label: "Docs" },
   { href: "/pricing", label: "Pricing" },
 ] as const;
 
 type MarketingNavProps = {
   homeAnchors?: readonly { href: string; label: string }[];
+  links?: readonly { href: string; label: string }[];
 };
 
-export function MarketingNav({ homeAnchors }: MarketingNavProps = {}) {
+export function MarketingNav({ homeAnchors, links = NAV_LINKS }: MarketingNavProps = {}) {
   const pathname = usePathname();
   const { isLoaded, isSignedIn } = useUser();
 
@@ -47,7 +48,7 @@ export function MarketingNav({ homeAnchors }: MarketingNavProps = {}) {
               {link.label}
             </a>
           ))}
-          {NAV_LINKS.map((link) => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -64,7 +65,7 @@ export function MarketingNav({ homeAnchors }: MarketingNavProps = {}) {
           </Link>
         ) : null}
         <Link className="gp-button gp-button--primary" href="/arena">
-          Open Arena
+          Open Studio
         </Link>
       </div>
     </header>

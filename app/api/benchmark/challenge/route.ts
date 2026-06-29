@@ -3,11 +3,19 @@ import { NextResponse } from "next/server";
 
 import { apiLogger, durationMs, logUnauthorized, logValidationError } from "@/lib/api-log";
 import { recordChallengeResult } from "@/lib/benchmark-store";
+import {
+  ensureProfile,
+  grantCredits,
+  InsufficientCreditsError,
+  spendCredits,
+} from "@/lib/credits";
 import { createId } from "@/lib/domain";
 import { gradeImageWithVlm } from "@/lib/fal/vision";
 import { runModel } from "@/lib/fal/client";
 import { getChallenge } from "@/lib/imagebench";
 import { MODELS } from "@/lib/models";
+
+const VLM_JUDGE_CREDIT_COST = 1;
 
 export async function POST(request: Request) {
   const started = Date.now();
@@ -52,8 +60,52 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid model" }, { status: 400 });
   }
 
+  const creditCost = model.creditCost + VLM_JUDGE_CREDIT_COST;
+  const creditRef = createId("bench");
+  let balanceAfterDebit: number;
+  try {
+    await ensureProfile(userId);
+    balanceAfterDebit = await spendCredits(
+      userId,
+      creditCost,
+      "benchmark",
+      creditRef,
+    );
+  } catch (error) {
+    if (error instanceof InsufficientCreditsError) {
+      log.info("challenge.insufficient_credits", {
+        suiteRunId,
+        challengeId,
+        modelId,
+        requiredCredits: error.required,
+        balance: error.balance,
+      });
+      return NextResponse.json(
+        {
+          error: "Not enough credits",
+          code: "insufficient_credits",
+          creditsRequired: error.required,
+          creditsBalance: error.balance,
+        },
+        { status: 402 },
+      );
+    }
+    log.error("challenge.credit_check_failed", error, {
+      suiteRunId,
+      challengeId,
+      modelId,
+      creditCost,
+    });
+    const message =
+      error instanceof Error ? error.message : "Credit check failed";
+    return NextResponse.json({ error: message }, { status: 503 });
+  }
+
   const runLog = log.child({ suiteRunId, challengeId, modelId, category: challenge.category });
-  runLog.info("challenge.start");
+  runLog.info("challenge.start", {
+    creditCost,
+    creditsBalance: balanceAfterDebit,
+  });
 
   const genStart = Date.now();
   try {
@@ -109,14 +161,37 @@ export async function POST(request: Request) {
       passed: grade.passed,
       vlmOutput: grade.raw,
       latencyMs,
+      creditsCharged: creditCost,
+      creditsBalance: balanceAfterDebit,
     });
   } catch (error) {
+    const balanceAfterRefund = await grantCredits(
+      userId,
+      creditCost,
+      "benchmark_refund",
+      creditRef,
+    ).catch((refundError) => {
+      runLog.error("challenge.refund_failed", refundError, {
+        creditRef,
+        creditCost,
+      });
+      return null;
+    });
+
     runLog.error("challenge.failed", error, {
       latencyMs: durationMs(genStart),
       totalLatencyMs: durationMs(started),
+      refunded: balanceAfterRefund !== null,
     });
     const message = error instanceof Error ? error.message : "Challenge failed";
-    return NextResponse.json({ error: message }, { status: 502 });
+    return NextResponse.json(
+      {
+        error: message,
+        creditsRefunded: balanceAfterRefund !== null ? creditCost : 0,
+        creditsBalance: balanceAfterRefund,
+      },
+      { status: 502 },
+    );
   }
 }
 

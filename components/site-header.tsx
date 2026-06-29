@@ -7,11 +7,12 @@ import { BadgeCheck, GalleryHorizontalEnd } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useCredits } from "@/hooks/use-credits";
 
 const ROUTES: Record<string, { title: string; description: string }> = {
   "/arena": {
-    title: "Arena",
-    description: "Compare model outputs head-to-head and pick a winner.",
+    title: "Create",
+    description: "Generate images and compare models when the brief needs it.",
   },
   "/evals": {
     title: "Refine",
@@ -54,6 +55,7 @@ function currentRoute(pathname: string) {
 export function SiteHeader() {
   const pathname = usePathname();
   const route = currentRoute(pathname);
+  const { credits } = useCredits();
 
   return (
     <header className="gp-appheader">
@@ -68,7 +70,7 @@ export function SiteHeader() {
       <div className="gp-appheader__right">
         <span className="gp-appheader__status">
           <BadgeCheck size={15} aria-hidden="true" />
-          Evaluation workspace
+          {credits ? `${credits.balance} credits` : "Image studio"}
         </span>
         <Button asChild variant="outline" size="sm">
           <Link href="/pricing">

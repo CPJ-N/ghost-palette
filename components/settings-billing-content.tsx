@@ -6,7 +6,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import type { BillingInterval, PaidPlan } from "@/lib/stripe/catalog";
+import { useCredits } from "@/hooks/use-credits";
+import {
+  CREDIT_PRICE_CENTS,
+  CREDITS_PER_USD,
+  type BillingInterval,
+  type PaidPlan,
+} from "@/lib/stripe/catalog";
 
 const BASIC_OPTIONS = [
   { credits: 1000, price: 20 },
@@ -37,6 +43,7 @@ export function SettingsBillingContent() {
   const [pro, setPro] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { credits, isLoadingCredits, refreshCredits } = useCredits();
   const interval: BillingInterval = annual ? "year" : "month";
 
   async function startCheckout(plan: PaidPlan, credits: number) {
@@ -58,6 +65,7 @@ export function SettingsBillingContent() {
       if (!response.ok || !data.url) {
         throw new Error(data.error ?? "Checkout failed");
       }
+      await refreshCredits();
       window.location.href = data.url;
     } catch (checkoutError) {
       setError(
@@ -81,7 +89,16 @@ export function SettingsBillingContent() {
       {error ? <p className="gp-settings-error">{error}</p> : null}
       <p className="gp-settings-copy">
         Subscriptions grant monthly credits. Annual billing includes two months
-        free. Manage your plan here or on the public pricing page.
+        free. 1 credit = {CREDIT_PRICE_CENTS} cents, so $1 buys{" "}
+        {CREDITS_PER_USD} credits.
+      </p>
+      <p className="gp-settings-copy">
+        Current balance:{" "}
+        {isLoadingCredits && !credits
+          ? "checking..."
+          : credits
+            ? `${credits.balance.toLocaleString()} credits`
+            : "unavailable"}
       </p>
       <div className="gp-billtoggle gp-billtoggle--compact" role="group">
         <button

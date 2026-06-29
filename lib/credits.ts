@@ -2,8 +2,26 @@ import "server-only";
 
 import { createLogger } from "@/lib/logger";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { FREE_MONTHLY_CREDITS } from "@/lib/stripe/catalog";
 
 const log = createLogger("credits");
+
+export type CreditSummary = {
+  balance: number;
+  plan: string;
+};
+
+export class InsufficientCreditsError extends Error {
+  readonly required: number;
+  readonly balance: number;
+
+  constructor(required: number, balance: number) {
+    super("Not enough credits");
+    this.name = "InsufficientCreditsError";
+    this.required = required;
+    this.balance = balance;
+  }
+}
 
 /** Insert a profile row if one doesn't exist yet (never clobbers existing data). */
 export async function ensureProfile(userId: string, email?: string | null) {
@@ -19,6 +37,8 @@ export async function ensureProfile(userId: string, email?: string | null) {
     log.error("profile.ensure_failed", error, { userId });
     throw error;
   }
+
+  await grantStarterCredits(userId);
 
   log.debug("profile.ensured", { userId, hasEmail: Boolean(email) });
 }
@@ -51,58 +71,113 @@ export async function setPlan(
   });
 }
 
-/**
- * Append-only credit grant (+) or spend (−). Reads the current balance, writes
- * a ledger row with `balance_after`, and updates the cached balance.
- *
- * NOTE: this read-modify-write is not atomic across concurrent calls. It's fine
- * for webhook volume; promote to a Postgres `grant_credits()` function before
- * per-generation spend becomes hot.
- */
+export async function getCreditSummary(userId: string): Promise<CreditSummary> {
+  const profile = await readCreditSummary(userId);
+  if (!profile) {
+    throw new Error("Profile not found");
+  }
+  return profile;
+}
+
+/** Append-only credit grant (+). */
 export async function grantCredits(
   userId: string,
   amount: number,
   reason: string,
   ref?: string | null,
 ): Promise<number> {
+  if (amount <= 0) {
+    throw new Error("grantCredits requires a positive amount");
+  }
+  return adjustCredits(userId, amount, reason, ref);
+}
+
+/** Spend credits atomically and fail if the account would go negative. */
+export async function spendCredits(
+  userId: string,
+  amount: number,
+  reason: string,
+  ref?: string | null,
+): Promise<number> {
+  if (amount <= 0) {
+    throw new Error("spendCredits requires a positive amount");
+  }
+  return adjustCredits(userId, -amount, reason, ref);
+}
+
+async function grantStarterCredits(userId: string) {
   const sb = supabaseAdmin();
-  const { data: profile, error: readError } = await sb
-    .from("profiles")
-    .select("credit_balance")
+
+  const { data, error } = await sb
+    .from("credit_transactions")
+    .select("id")
     .eq("user_id", userId)
-    .single();
+    .eq("reason", "signup")
+    .eq("ref", "starter")
+    .limit(1)
+    .maybeSingle();
 
-  if (readError) {
-    log.error("credits.read_balance_failed", readError, { userId, reason });
-    throw readError;
+  if (error) {
+    log.error("credits.starter_read_failed", error, { userId });
+    throw error;
   }
 
-  const balanceAfter = (profile?.credit_balance ?? 0) + amount;
+  if (data) return;
 
-  const { error: updateError } = await sb
+  await grantCredits(userId, FREE_MONTHLY_CREDITS, "signup", "starter").catch(
+    (error) => {
+      if (isDuplicateStarterGrant(error)) return;
+      throw error;
+    },
+  );
+}
+
+async function readCreditSummary(userId: string): Promise<CreditSummary | null> {
+  const sb = supabaseAdmin();
+  const { data, error } = await sb
     .from("profiles")
-    .update({ credit_balance: balanceAfter, updated_at: new Date().toISOString() })
-    .eq("user_id", userId);
+    .select("credit_balance, plan")
+    .eq("user_id", userId)
+    .maybeSingle();
 
-  if (updateError) {
-    log.error("credits.update_balance_failed", updateError, { userId, reason, amount });
-    throw updateError;
+  if (error) {
+    log.error("credits.read_balance_failed", error, { userId });
+    throw error;
   }
 
-  const { error: insertError } = await sb.from("credit_transactions").insert({
-    user_id: userId,
-    amount,
-    reason,
-    ref: ref ?? null,
-    balance_after: balanceAfter,
+  if (!data) return null;
+  return {
+    balance: data.credit_balance,
+    plan: data.plan,
+  };
+}
+
+async function adjustCredits(
+  userId: string,
+  amount: number,
+  reason: string,
+  ref?: string | null,
+): Promise<number> {
+  const sb = supabaseAdmin();
+  const { data, error } = await sb.rpc("adjust_credits", {
+    p_user_id: userId,
+    p_amount: amount,
+    p_reason: reason,
+    p_ref: ref ?? null,
   });
 
-  if (insertError) {
-    log.error("credits.ledger_insert_failed", insertError, { userId, reason, amount });
-    throw insertError;
+  if (error) {
+    if (isInsufficientCredits(error)) {
+      const profile = await readCreditSummary(userId).catch(() => null);
+      throw new InsufficientCreditsError(Math.abs(amount), profile?.balance ?? 0);
+    }
+
+    log.error("credits.adjust_failed", error, { userId, reason, amount, ref });
+    throw error;
   }
 
-  log.info("credits.granted", {
+  const balanceAfter = data ?? 0;
+  log.info("credits.adjusted", {
     userId,
     amount,
     reason,
@@ -111,4 +186,15 @@ export async function grantCredits(
   });
 
   return balanceAfter;
+}
+
+function isInsufficientCredits(error: { message?: string }) {
+  return (error.message ?? "").toLowerCase().includes("insufficient_credits");
+}
+
+function isDuplicateStarterGrant(error: { code?: string; message?: string }) {
+  return (
+    error.code === "23505" ||
+    (error.message ?? "").toLowerCase().includes("credit_tx_starter_unique_idx")
+  );
 }

@@ -20,6 +20,15 @@
   --color-bloom-2: oklch(50% 0 0 / 0.03);
   --color-backdrop: oklch(10% 0 0 / 0.56);
   --color-shadow: oklch(10% 0 0 / 0.12);
+  --color-composer-paper: oklch(8% 0 0);
+  --color-composer-paper-2: oklch(12% 0 0 / 0.82);
+  --color-composer-paper-3: oklch(15% 0 0 / 0.72);
+  --color-composer-ink: oklch(98% 0 0);
+  --color-composer-muted: oklch(72% 0 0);
+  --color-composer-rule: oklch(100% 0 0 / 0.14);
+  --color-composer-rule-2: oklch(100% 0 0 / 0.22);
+  --color-composer-shadow: oklch(0% 0 0 / 0.58);
+  --color-composer-veil: oklch(0% 0 0 / 0.62);
   --color-art-openai-a: oklch(78% 0 0);
   --color-art-openai-b: oklch(55% 0 0);
   --color-art-google-a: oklch(74% 0 0);
@@ -32,6 +41,7 @@
   --color-art-ideogram-b: oklch(50% 0 0);
   --color-art-spec: oklch(98% 0 0);
   --color-sheen: oklch(100% 0 0 / 0.08);
+  --color-glow: oklch(24% 0 0 / 0.05);
   --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
@@ -81,26 +91,35 @@
 }
 
 .dark {
-  --color-paper: oklch(10% 0 0);
-  --color-paper-2: oklch(14% 0 0);
-  --color-paper-3: oklch(18% 0 0);
-  --color-paper-4: oklch(22% 0 0);
-  --color-ink: oklch(96% 0 0);
-  --color-ink-2: oklch(82% 0 0);
-  --color-muted: oklch(65% 0 0);
-  --color-neutral: oklch(52% 0 0);
-  --color-rule: oklch(22% 0 0);
-  --color-rule-2: oklch(28% 0 0);
-  --color-accent: oklch(96% 0 0);
-  --color-accent-2: oklch(82% 0 0);
-  --color-accent-ink: oklch(10% 0 0);
-  --color-focus: oklch(82% 0 0);
+  --color-paper: oklch(7% 0 0);
+  --color-paper-2: oklch(11% 0 0);
+  --color-paper-3: oklch(15% 0 0);
+  --color-paper-4: oklch(20% 0 0);
+  --color-ink: oklch(98% 0 0);
+  --color-ink-2: oklch(80% 0 0);
+  --color-muted: oklch(62% 0 0);
+  --color-neutral: oklch(46% 0 0);
+  --color-rule: oklch(100% 0 0 / 0.09);
+  --color-rule-2: oklch(100% 0 0 / 0.16);
+  --color-accent: oklch(98% 0 0);
+  --color-accent-2: oklch(84% 0 0);
+  --color-accent-ink: oklch(8% 0 0);
+  --color-focus: oklch(85% 0 0);
   --color-danger: oklch(67% 0.14 25);
   --color-success: oklch(70% 0.1 145);
-  --color-bloom: oklch(50% 0 0 / 0.06);
-  --color-bloom-2: oklch(50% 0 0 / 0.04);
-  --color-backdrop: oklch(4% 0 0 / 0.72);
-  --color-shadow: oklch(4% 0 0 / 0.48);
+  --color-bloom: oklch(100% 0 0 / 0.05);
+  --color-bloom-2: oklch(100% 0 0 / 0.03);
+  --color-backdrop: oklch(2% 0 0 / 0.8);
+  --color-shadow: oklch(0% 0 0 / 0.6);
+  --color-composer-paper: oklch(8% 0 0);
+  --color-composer-paper-2: oklch(12% 0 0 / 0.82);
+  --color-composer-paper-3: oklch(15% 0 0 / 0.72);
+  --color-composer-ink: oklch(98% 0 0);
+  --color-composer-muted: oklch(72% 0 0);
+  --color-composer-rule: oklch(100% 0 0 / 0.14);
+  --color-composer-rule-2: oklch(100% 0 0 / 0.22);
+  --color-composer-shadow: oklch(0% 0 0 / 0.58);
+  --color-composer-veil: oklch(0% 0 0 / 0.62);
   --color-art-openai-a: oklch(49% 0 0);
   --color-art-openai-b: oklch(25% 0 0);
   --color-art-google-a: oklch(51% 0 0);
@@ -112,5 +131,6 @@
   --color-art-ideogram-a: oklch(50% 0 0);
   --color-art-ideogram-b: oklch(24% 0 0);
   --color-art-spec: oklch(97% 0 0);
-  --color-sheen: oklch(100% 0 0 / 0.08);
+  --color-sheen: oklch(100% 0 0 / 0.1);
+  --color-glow: oklch(100% 0 0 / 0.12);
 }

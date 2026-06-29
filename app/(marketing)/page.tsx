@@ -11,14 +11,19 @@ import { sampleSrc, SHOWCASE_PROMPT } from "@/lib/samples";
 
 const FEATURES = [
   {
-    tag: "Arena",
-    title: "Head-to-head",
-    body: "Run one prompt across every model, compare outputs side by side, and pick the winner — blind or named.",
+    tag: "Create",
+    title: "Generate with the right model",
+    body: "Start with a normal prompt, choose a model, or compare several when the brief needs a stronger answer.",
+  },
+  {
+    tag: "Compare",
+    title: "Model-aware decisions",
+    body: "Inspect outputs side by side, pick the winner, and use benchmark signals when speed, cost, or fidelity matters.",
   },
   {
     tag: "Refine",
-    title: "Editing and refinement",
-    body: "Use a reference direction, ask every model for the same refinement, and evaluate which one gets closest.",
+    title: "Edit from a reference",
+    body: "Upload a direction, generate a refinement, and keep the outputs that move the image closer to finished.",
   },
 ];
 
@@ -30,6 +35,10 @@ export default function MarketingPage() {
           { href: "#how", label: "How it works" },
           { href: "#features", label: "Features" },
         ]}
+        links={[
+          { href: "/docs", label: "Docs" },
+          { href: "/pricing", label: "Pricing" },
+        ]}
       />
 
       <section className="gp-hero-band" aria-labelledby="hero-title">
@@ -37,24 +46,24 @@ export default function MarketingPage() {
 
         <div className="gp-hero">
           <div className="gp-hero__copy">
-            <p className="gp-kicker">The image-model workspace</p>
-            <h1 id="hero-title">Find the model that gets it right.</h1>
+            <p className="gp-kicker">The model-smart image studio</p>
+            <h1 id="hero-title">Create images with the model that gets it right.</h1>
             <p className="gp-hero__lede">
-              Run one prompt through every leading image model, inspect the outputs
-              side by side, and keep the one worth shipping.
+              Generate finished images, compare leading models when it matters,
+              and keep the outputs worth shipping.
             </p>
 
             <nav className="gp-hero-rail" aria-label="Evaluation">
-              <Link href="/leaderboard">Live scores</Link>
+              <Link href="/leaderboard">Model scores</Link>
               <span aria-hidden="true">·</span>
-              <Link href="/benchmark">Run suite</Link>
+              <Link href="/benchmark">Benchmarks</Link>
               <span aria-hidden="true">·</span>
-              <Link href="/docs/benchmarks">Industry</Link>
+              <Link href="/docs/benchmarks">Model data</Link>
             </nav>
 
             <div className="gp-hero__actions">
               <Link className="gp-button gp-button--primary" href="/arena">
-                Open Arena
+                Open Studio
               </Link>
               <Link className="gp-button gp-button--ghost" href="/pricing">
                 See pricing
@@ -65,7 +74,7 @@ export default function MarketingPage() {
           <div className="gp-hero__stage" aria-label="Ghost Palette product preview">
             <div className="gp-hero-stage">
               <header className="gp-hero-stage__bar">
-                <span className="gp-hero-stage__label">Arena preview</span>
+                <span className="gp-hero-stage__label">Studio preview</span>
                 <span className="gp-hero-stage__status">
                   {MODELS.length} models · one prompt
                 </span>
@@ -104,26 +113,26 @@ export default function MarketingPage() {
         <ol className="gp-steps">
           <li>
             <span className="gp-step__n">01</span>
-            <strong>Prompt once</strong>
-            <span>Write one brief and keep it identical across every model.</span>
+            <strong>Create first</strong>
+            <span>Write a prompt and generate with the model that fits the job.</span>
           </li>
           <li>
             <span className="gp-step__n">02</span>
-            <strong>Compare side by side</strong>
-            <span>See composition, detail, and text handling in a single grid.</span>
+            <strong>Compare when needed</strong>
+            <span>Run the same brief across models to see composition, detail, and text handling.</span>
           </li>
           <li>
             <span className="gp-step__n">03</span>
-            <strong>Keep the winner</strong>
-            <span>Favorite the best output, or score it against a reference.</span>
+            <strong>Save the winner</strong>
+            <span>Keep finished outputs, reference edits, and model picks in your Library.</span>
           </li>
         </ol>
       </section>
 
       <section className="gp-features" id="features" aria-labelledby="features-title">
         <div className="gp-features__head">
-          <h2 id="features-title">Two ways to compare</h2>
-          <p>Arena and Refine — one model roster, focused workflows.</p>
+          <h2 id="features-title">A studio that understands models</h2>
+          <p>Create, compare, and refine from one model roster.</p>
         </div>
         <div className="gp-features__grid">
           {FEATURES.map((feature) => (
@@ -139,9 +148,9 @@ export default function MarketingPage() {
       <SampleMasonry />
 
       <section className="gp-cta" aria-labelledby="cta-title">
-        <h2 id="cta-title">Stop guessing which model to use.</h2>
+        <h2 id="cta-title">Start with the image. Let the model choice get smarter.</h2>
         <Link className="gp-button gp-button--primary" href="/arena">
-          Open Arena
+          Open Studio
           <ArrowUpRight size={18} aria-hidden="true" />
         </Link>
       </section>

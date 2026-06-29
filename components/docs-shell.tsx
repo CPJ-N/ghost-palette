@@ -49,7 +49,7 @@ const DOCS_NAV: {
     title: "Overview",
     url: "/docs",
     icon: LayoutGrid,
-    description: "Evaluation docs — live scores, industry data, methodology.",
+    description: "Studio docs — workflows, live scores, industry data, methodology.",
   },
   {
     title: "Industry benchmarks",
@@ -67,7 +67,7 @@ const DOCS_NAV: {
     title: "Methodology",
     url: "/docs/methodology",
     icon: FlaskConical,
-    description: "Fair comparison rules for Arena and Refine workflows.",
+    description: "Fair comparison rules for Create and Refine workflows.",
   },
 ];
 

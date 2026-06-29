@@ -2,11 +2,17 @@
 // The app resolves prices by `lookupKey` at runtime, so test/live price IDs are
 // never hardcoded.
 //
+// 1 credit = $0.02, so $1 buys 50 credits. Keep paid pack prices aligned to
+// this exchange rate unless a discount is explicitly described.
+//
 // `credits` is always the MONTHLY allotment. Monthly plans grant it on each
 // Stripe invoice; annual plans (billed once a year) grant the first month on
 // purchase and the rest via the monthly credit-refresh job. `priceUsd` is the
 // amount actually charged for the chosen interval (annual = 10× monthly — i.e.
 // two months free).
+
+export const CREDIT_PRICE_CENTS = 2;
+export const CREDITS_PER_USD = 50;
 
 export type PaidPlan = "basic" | "pro";
 export type BillingInterval = "month" | "year";

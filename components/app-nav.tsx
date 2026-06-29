@@ -1,14 +1,14 @@
 "use client";
 
 import { useClerk, useUser } from "@clerk/nextjs";
-import { LogOut, Library, Moon, Settings, Sun, Swords, Target } from "lucide-react";
+import { Brush, LogOut, Library, Moon, Settings, SlidersHorizontal, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 
 const PRIMARY = [
-  { href: "/arena", label: "Arena", icon: Swords },
-  { href: "/evals", label: "Evals", icon: Target },
+  { href: "/arena", label: "Create", icon: Brush },
+  { href: "/evals", label: "Refine", icon: SlidersHorizontal },
 ];
 
 const SECONDARY = [

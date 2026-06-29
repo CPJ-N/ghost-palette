@@ -3,6 +3,7 @@
 import { BookmarkCheck, BookmarkPlus, Loader2 } from "lucide-react";
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { saveRun, hasSavedRun } from "@/lib/runs-storage";
 import type { GenerationResult, RunMode } from "@/lib/types";
 
@@ -41,7 +42,9 @@ export function SaveRunButton({
   }
 
   return (
-    <button
+    <Button
+      variant={saved ? "ghost" : "outline"}
+      size="lg"
       className={`gp-button ${saved ? "gp-button--ghost" : "gp-button--outline"}`}
       type="button"
       onClick={onSave}
@@ -56,6 +59,6 @@ export function SaveRunButton({
         <BookmarkPlus size={16} aria-hidden="true" />
       )}
       {saved ? "Saved to Library" : "Save to Library"}
-    </button>
+    </Button>
   );
 }

@@ -47,6 +47,8 @@ export default function BenchmarkPage() {
   const preset = PRESETS[presetIdx];
   const isFullSuite = preset.label === "Full suite";
   const isFullCategory = preset.label === "Full category";
+  const selectedModel = MODELS.find((model) => model.id === modelId) ?? MODELS[0];
+  const perChallengeCreditCost = (selectedModel?.creditCost ?? 1) + 1;
 
   const estimatedCount = useMemo(() => {
     if (isFullCategory) {
@@ -55,6 +57,7 @@ export default function BenchmarkPage() {
     }
     return preset.limit;
   }, [preset, category, isFullCategory]);
+  const estimatedCreditCost = estimatedCount * perChallengeCreditCost;
 
   async function runSuite() {
     if (!modelId || running) return;
@@ -266,7 +269,7 @@ export default function BenchmarkPage() {
             ) : (
               <>
                 <Play size={16} aria-hidden="true" />
-                Run ~{estimatedCount} challenges
+                Run ~{estimatedCount} challenges · ~{estimatedCreditCost} credits
               </>
             )}
           </button>
