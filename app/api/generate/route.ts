@@ -10,7 +10,7 @@ import {
 } from "@/lib/credits";
 import { createId } from "@/lib/domain";
 import { runModel } from "@/lib/fal/client";
-import { MODELS } from "@/lib/models";
+import { isModelAvailable, MODELS } from "@/lib/models";
 
 // Generates ONE image. The client fires one request per (model × seed) so each
 // serverless invocation stays short and gives natural per-tile progress.
@@ -41,6 +41,16 @@ export async function POST(request: Request) {
       modelId: body.modelId,
       hasPrompt: Boolean(prompt),
     });
+    return NextResponse.json(
+      { error: "A valid modelId and prompt are required" },
+      { status: 400 },
+    );
+  }
+
+  // Internal models (non-commercial / unreleased) are usable in local dev only —
+  // reject them in production even if a client is modified to request one.
+  if (!isModelAvailable(model.id)) {
+    logValidationError(log, "model_unavailable", { modelId: model.id });
     return NextResponse.json(
       { error: "A valid modelId and prompt are required" },
       { status: 400 },

@@ -1018,6 +1018,39 @@
   --art-sy: 96%;
 }
 
+/* Seedream 4 — photoreal: bright spec lower-right, deep base, steep diagonal */
+.art-seedream {
+  --art-hi: var(--color-art-stability-a);
+  --art-base: var(--color-art-openai-b);
+  --art-angle: 300deg;
+  --art-hx: 82%;
+  --art-hy: 76%;
+  --art-sx: 18%;
+  --art-sy: 26%;
+}
+
+/* Qwen Image — structured text/layout: side-lit, horizontal emphasis */
+.art-qwen {
+  --art-hi: var(--color-art-google-a);
+  --art-base: var(--color-art-bfl-b);
+  --art-angle: 60deg;
+  --art-hx: 16%;
+  --art-hy: 52%;
+  --art-sx: 88%;
+  --art-sy: 50%;
+}
+
+/* Ideogram V3 — typography/posters: centered spotlight rising from base */
+.art-ideogram {
+  --art-hi: var(--color-art-ideogram-a);
+  --art-base: var(--color-art-stability-b);
+  --art-angle: 118deg;
+  --art-hx: 50%;
+  --art-hy: 86%;
+  --art-sx: 50%;
+  --art-sy: 12%;
+}
+
 .gp-art {
   display: grid;
   aspect-ratio: 1;

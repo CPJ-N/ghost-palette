@@ -26,14 +26,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCredits } from "@/hooks/use-credits";
 import { createId, hashSeed } from "@/lib/domain";
 import { generateOne } from "@/lib/generate";
-import { DEFAULT_SELECTION, getModel, MODELS } from "@/lib/models";
+import {
+  availableModels,
+  DEFAULT_SELECTION,
+  getModel,
+  isModelAvailable,
+} from "@/lib/models";
 import type { GenerationResult } from "@/lib/types";
 
 const MAX_BATCH_SIZE = 4;
 
 export default function ArenaPage() {
   const [prompt, setPrompt] = useState("");
-  const [selected, setSelected] = useState<string[]>(DEFAULT_SELECTION);
+  const [selected, setSelected] = useState<string[]>(() =>
+    DEFAULT_SELECTION.filter(isModelAvailable),
+  );
   const [batchSize, setBatchSize] = useState(1);
   const [results, setResults] = useState<GenerationResult[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -344,7 +351,7 @@ export default function ArenaPage() {
               <DropdownMenuContent className="gp-composer-dock__menu" align="start">
                 <DropdownMenuLabel>Models</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {MODELS.map((model) => (
+                {availableModels().map((model) => (
                   <DropdownMenuCheckboxItem
                     key={model.id}
                     checked={selected.includes(model.id)}

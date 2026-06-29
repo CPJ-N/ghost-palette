@@ -1,3 +1,5 @@
+import { isModelAvailable } from "@/lib/models";
+
 import { INDUSTRY_MODELS } from "./models";
 import { BENCHMARK_SOURCES } from "./sources";
 import type { IndustryModel, IndustryLeaderboardRow, SortKey } from "./types";
@@ -20,9 +22,9 @@ export function getBenchmarkGlossary() {
 }
 
 export function getGpModelIds(): string[] {
-  return INDUSTRY_MODELS.filter((m) => m.inGhostPalette).map(
-    (m) => m.ghostPaletteId ?? m.id,
-  );
+  return INDUSTRY_MODELS.filter((m) => m.inGhostPalette)
+    .map((m) => m.ghostPaletteId ?? m.id)
+    .filter(isModelAvailable);
 }
 
 function sortValue(model: IndustryModel, key: SortKey): number | string {
@@ -53,7 +55,9 @@ export function getLeaderboardRows(
 
   const models = (
     gpOnly
-      ? INDUSTRY_MODELS.filter((m) => m.inGhostPalette)
+      ? INDUSTRY_MODELS.filter(
+          (m) => m.inGhostPalette && isModelAvailable(m.ghostPaletteId ?? m.id),
+        )
       : [...INDUSTRY_MODELS]
   );
 

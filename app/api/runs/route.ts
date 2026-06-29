@@ -106,8 +106,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ runId });
   } catch (error) {
     log.error("runs.persist_failed", error, { latencyMs: durationMs(started) });
-    const message = error instanceof Error ? error.message : "Failed to save run";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Failed to save run" }, { status: 500 });
   }
 }
 
@@ -129,7 +128,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ runs });
   } catch (error) {
     log.error("runs.list_failed", error, { latencyMs: durationMs(started) });
-    const message = error instanceof Error ? error.message : "Failed to load runs";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Failed to load runs" }, { status: 500 });
   }
 }

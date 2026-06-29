@@ -9,10 +9,10 @@ import {
   PlugIcon,
 } from "lucide-react";
 
-import SettingsAccountPage from "@/app/(app)/settings/account/page";
-import SettingsAppearancePage from "@/app/(app)/settings/appearance/page";
-import SettingsProvidersPage from "@/app/(app)/settings/providers/page";
+import { SettingsAccountContent } from "@/components/settings-account-content";
+import { SettingsAppearanceContent } from "@/components/settings-appearance-content";
 import { SettingsBillingContent } from "@/components/settings-billing-content";
+import { SettingsProvidersContent } from "@/components/settings-providers-content";
 import { SettingsUsageContent } from "@/components/settings-usage-content";
 import { cn } from "@/lib/utils";
 import {
@@ -33,11 +33,11 @@ import {
 } from "@/components/ui/sidebar";
 
 const SECTIONS = [
-  { name: "Account", icon: BadgeCheckIcon, Content: SettingsAccountPage },
+  { name: "Account", icon: BadgeCheckIcon, Content: SettingsAccountContent },
   { name: "Usage", icon: GaugeIcon, Content: SettingsUsageContent },
   { name: "Billing", icon: CreditCardIcon, Content: SettingsBillingContent },
-  { name: "Appearance", icon: PaintbrushIcon, Content: SettingsAppearancePage },
-  { name: "Providers", icon: PlugIcon, Content: SettingsProvidersPage },
+  { name: "Appearance", icon: PaintbrushIcon, Content: SettingsAppearanceContent },
+  { name: "Providers", icon: PlugIcon, Content: SettingsProvidersContent },
 ] as const;
 
 type SectionName = (typeof SECTIONS)[number]["name"];
@@ -56,7 +56,7 @@ export function SettingsDialog({
   }, [open]);
 
   const ActiveContent =
-    SECTIONS.find((s) => s.name === active)?.Content ?? SettingsAccountPage;
+    SECTIONS.find((s) => s.name === active)?.Content ?? SettingsAccountContent;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

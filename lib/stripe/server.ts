@@ -16,6 +16,6 @@ export function stripe(): Stripe {
   if (!key) {
     throw new Error("STRIPE_SECRET_KEY is not set in .env.local");
   }
-  cached = new Stripe(key, { typescript: true });
+  cached = new Stripe(key, { apiVersion: "2026-05-27.dahlia", typescript: true });
   return cached;
 }

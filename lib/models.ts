@@ -10,6 +10,10 @@ export type ModelDefinition = {
   adapter: string;
   creditCost: number;
   artClass: string;
+  /** Internal models (dev-only or non-commercially-licensed) are usable only in
+   *  local development — hidden from the picker and rejected by the generate API
+   *  in production. Gated via the built-in NODE_ENV, so there is no flag to set. */
+  internal?: boolean;
 };
 
 export const MODELS: ModelDefinition[] = [
@@ -22,8 +26,8 @@ export const MODELS: ModelDefinition[] = [
     creditCost: 2,
     artClass: "art-flux2-pro",
   },
-  // DEV/TESTING ONLY: FLUX.2 [dev] has a non-commercial license. Keep it while
-  // building the app, but REMOVE before production / general launch.
+  // INTERNAL: FLUX.2 [dev] has a non-commercial license, so it's marked internal —
+  // available in local development only, never surfaced to public/production users.
   {
     id: "flux2-dev",
     name: "FLUX.2 [dev]",
@@ -32,6 +36,7 @@ export const MODELS: ModelDefinition[] = [
     adapter: "fal-ai/flux-2",
     creditCost: 1,
     artClass: "art-flux2-dev",
+    internal: true,
   },
   {
     id: "sd35-large",
@@ -58,7 +63,7 @@ export const MODELS: ModelDefinition[] = [
     description: "ByteDance's latest — top-ranked photoreal detail and prompt adherence.",
     adapter: "fal-ai/bytedance/seedream/v4/text-to-image",
     creditCost: 3,
-    artClass: "art-flux2-pro",
+    artClass: "art-seedream",
   },
   {
     id: "qwen-image",
@@ -67,7 +72,7 @@ export const MODELS: ModelDefinition[] = [
     description: "Alibaba Qwen — standout complex text rendering and layout control.",
     adapter: "fal-ai/qwen-image",
     creditCost: 2,
-    artClass: "art-flux1-dev",
+    artClass: "art-qwen",
   },
   {
     id: "ideogram-v3",
@@ -76,11 +81,29 @@ export const MODELS: ModelDefinition[] = [
     description: "Best-in-class typography — near-perfect spelling, logos, and posters.",
     adapter: "fal-ai/ideogram/v3",
     creditCost: 4,
-    artClass: "art-recraft",
+    artClass: "art-ideogram",
   },
 ];
 
 export const DEFAULT_SELECTION = ["flux2-pro", "flux2-dev"];
+
+// Internal models (just-released or non-commercially-licensed) are available only
+// outside production. Keyed off the built-in NODE_ENV — local `pnpm dev` runs as
+// "development"; Vercel preview + production builds are "production" — so there is
+// no environment variable to create or set.
+const INTERNAL_MODELS_ALLOWED = process.env.NODE_ENV !== "production";
+
+/** Models selectable in the current environment: every public model, plus internal
+ *  models only in local development. */
+export function availableModels(): ModelDefinition[] {
+  return MODELS.filter((model) => !model.internal || INTERNAL_MODELS_ALLOWED);
+}
+
+/** Server gate: whether a model id may be generated in the current environment. */
+export function isModelAvailable(modelId: string): boolean {
+  const model = MODELS.find((m) => m.id === modelId);
+  return model !== undefined && (!model.internal || INTERNAL_MODELS_ALLOWED);
+}
 
 export function getModel(modelId: string): ModelDefinition {
   return (
