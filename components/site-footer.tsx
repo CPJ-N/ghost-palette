@@ -48,12 +48,21 @@ export function SiteFooter() {
             <Link href="/docs">Docs</Link>
             <a href="mailto:hello@ghostpalette.app">Contact</a>
           </div>
+          <div>
+            <p>Legal</p>
+            <Link href="/terms">Terms of Service</Link>
+            <Link href="/privacy">Privacy Policy</Link>
+          </div>
         </nav>
       </div>
 
       <div className="gp-sitefooter__bottom">
         <span>© 2026 Ghost Palette</span>
         <span>All rights reserved</span>
+        <span className="gp-sitefooter__legal-links">
+          <Link href="/terms">Terms</Link>
+          <Link href="/privacy">Privacy</Link>
+        </span>
       </div>
     </footer>
   );

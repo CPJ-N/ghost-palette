@@ -1,6 +1,7 @@
 import {ClerkProvider} from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
+import { CookieConsent } from "@/components/cookie-consent";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
@@ -47,6 +48,7 @@ export default function RootLayout({
         >
           <ClerkProvider>
             <TooltipProvider delayDuration={800}>{children}</TooltipProvider>
+            <CookieConsent />
           </ClerkProvider>
         </ThemeProvider>
       </body>

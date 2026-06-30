@@ -311,6 +311,19 @@ export function AuthForm({ mode }: { mode: Mode }) {
                     {submitting ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}
                     {isSignUp ? "Create account" : "Sign in"}
                   </Button>
+                  {isSignUp ? (
+                    <p className="text-center text-xs text-muted-foreground">
+                      By creating an account, you agree to our{" "}
+                      <Link href="/terms" className="underline underline-offset-4">
+                        Terms
+                      </Link>{" "}
+                      and{" "}
+                      <Link href="/privacy" className="underline underline-offset-4">
+                        Privacy Policy
+                      </Link>
+                      .
+                    </p>
+                  ) : null}
                 </FieldGroup>
               </form>
 
