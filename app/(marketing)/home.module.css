@@ -1,0 +1,1093 @@
+/* Ghost Palette — composed premium home page.
+   Consolidates three landing variants into one module:
+     · HERO    — cinematic ambient reel  (from landing/cinematic)
+     · FEATURES — "Why Ghost Palette"     (from landing/wall)
+     · ROSTER  — "Models compared"        (from landing/editorial)
+     · PROCESS — "How it works" strip     (from landing/cinematic steps)
+     · CLOSING — "Open Studio" CTA        (from landing/cinematic closing)
+
+   STRICTLY grayscale chrome: every color references an existing OKLCH token
+   via var(). The ONLY color on the page comes from the generated media
+   (the Kling clips + flux stills). The dark hero is built from composer-*
+   tokens, which are identical in light + dark themes, so the cinema stays
+   dark regardless of the theme toggle. color-mix(in oklab, …, transparent)
+   is token-based alpha and introduces no hue. */
+
+.page {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  overflow-x: hidden;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+/* Visible focus everywhere, even if a global reset stripped it. */
+.page a:focus-visible,
+.page button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* ================================================================ HERO */
+
+.hero {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: var(--space-3xl) var(--page-gutter) var(--space-2xl);
+  isolation: isolate;
+  background: var(--color-composer-paper);
+  overflow: hidden;
+}
+
+/* --- Signature: the ambient drifting reel ----------------------------- */
+
+.reel {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-base);
+  /* timing for the montage; cycle scales with frame count */
+  --reel-step: 5.2s;
+  --reel-cycle: calc(var(--reel-count, 4) * var(--reel-step));
+  pointer-events: none;
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  overflow: hidden;
+  animation: frameFade var(--reel-cycle) var(--ease-in-out) infinite;
+  animation-delay: calc(var(--i) * var(--reel-step));
+  will-change: opacity;
+}
+
+.frame img,
+.frame video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  animation: kenBurns var(--reel-cycle) var(--ease-in-out) infinite alternate;
+  animation-delay: calc(var(--i) * var(--reel-step) * -1);
+  will-change: transform;
+}
+
+/* parallax variety — each frame drifts from a different anchor */
+.frame:nth-child(1) img { transform-origin: 28% 32%; }
+.frame:nth-child(2) img { transform-origin: 72% 38%; }
+.frame:nth-child(3) img { transform-origin: 40% 70%; }
+.frame:nth-child(4) img { transform-origin: 66% 64%; }
+
+@keyframes frameFade {
+  0%   { opacity: 0; }
+  3%   { opacity: 1; }
+  20%  { opacity: 1; }
+  24%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes kenBurns {
+  from { transform: scale(1.05) translate3d(0, 0, 0); }
+  to   { transform: scale(1.2) translate3d(-2.5%, 2%, 0); }
+}
+
+/* veil + vignette: pull the reel into a moody field so the type reads */
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z-base) + 1);
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 38%, transparent 0%, var(--color-composer-veil) 78%),
+    linear-gradient(
+      to bottom,
+      var(--color-composer-veil) 0%,
+      transparent 26%,
+      transparent 58%,
+      var(--color-composer-paper) 100%
+    );
+}
+
+/* film grain — SVG turbulence, desaturated, no color literals */
+.grain {
+  position: absolute;
+  inset: -50%;
+  z-index: calc(var(--z-base) + 2);
+  pointer-events: none;
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  animation: grainShift 0.9s steps(3) infinite;
+  will-change: transform;
+}
+
+@keyframes grainShift {
+  0%   { transform: translate3d(0, 0, 0); }
+  33%  { transform: translate3d(-3%, 2%, 0); }
+  66%  { transform: translate3d(2%, -3%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* a single slow scanline drifting down — sells "this is footage" */
+.scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 18%;
+  z-index: calc(var(--z-base) + 2);
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--color-sheen) 50%,
+    transparent 100%
+  );
+  opacity: 0.5;
+  animation: scan 9s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes scan {
+  from { transform: translate3d(0, -10%, 0); }
+  to   { transform: translate3d(0, 560%, 0); }
+}
+
+/* --- HUD: corner mono labels frame the reel as a clip ----------------- */
+
+.hud {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-raised);
+  pointer-events: none;
+  padding: clamp(var(--space-lg), 4vw, var(--space-2xl));
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-composer-muted);
+}
+
+.hudTopLeft {
+  position: absolute;
+  top: clamp(var(--space-lg), 4vw, var(--space-2xl));
+  left: clamp(var(--space-lg), 4vw, var(--space-2xl));
+}
+
+.hudTopRight {
+  position: absolute;
+  top: clamp(var(--space-lg), 4vw, var(--space-2xl));
+  right: clamp(var(--space-lg), 4vw, var(--space-2xl));
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  color: var(--color-composer-ink);
+}
+
+.recDot {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 999px;
+  background: var(--color-composer-ink);
+  animation: pulse 1.8s var(--ease-in-out) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.35; transform: scale(0.78); }
+}
+
+/* --- hero content ----------------------------------------------------- */
+
+.heroInner {
+  position: relative;
+  z-index: var(--z-raised);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.heroKicker {
+  margin: 0 0 var(--space-lg);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-composer-muted);
+  animation: rise var(--dur-long) var(--ease-out) both;
+}
+
+.heroTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-display);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  color: var(--color-composer-ink);
+  text-shadow: 0 2px 40px var(--color-composer-shadow);
+  animation: rise var(--dur-long) var(--ease-out) both;
+  animation-delay: 80ms;
+}
+
+.heroTitle em {
+  font-style: italic;
+  font-weight: 400;
+}
+
+.heroLede {
+  margin: var(--space-lg) auto 0;
+  max-width: 38rem;
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.55;
+  color: var(--color-composer-muted);
+  text-wrap: pretty;
+  animation: rise var(--dur-long) var(--ease-out) both;
+  animation-delay: 160ms;
+}
+
+.heroActions {
+  margin-top: var(--space-xl);
+  animation: rise var(--dur-long) var(--ease-out) both;
+  animation-delay: 240ms;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 2.75rem;
+  padding: var(--space-sm) var(--space-lg);
+  border: var(--rule-hair) solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--color-composer-ink);
+  color: var(--color-composer-paper);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition:
+    transform var(--dur-short) var(--ease-out),
+    box-shadow var(--dur-short) var(--ease-out),
+    opacity var(--dur-short) var(--ease-out);
+}
+
+.cta svg {
+  transition: transform var(--dur-short) var(--ease-out);
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 50px var(--color-composer-shadow);
+}
+
+.cta:hover svg {
+  transform: translate3d(2px, -2px, 0);
+}
+
+.cta:active {
+  transform: translateY(0);
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--color-art-spec);
+  outline-offset: 3px;
+}
+
+/* --- now showing: captions synced to the montage ---------------------- */
+
+.nowShowing {
+  position: relative;
+  height: 1.4em;
+  margin-top: var(--space-2xl);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-composer-muted);
+}
+
+.caption {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  opacity: 0;
+  animation: frameFade var(--reel-cycle) var(--ease-in-out) infinite;
+  animation-delay: calc(var(--i) * var(--reel-step));
+}
+
+.captionIndex {
+  color: var(--color-composer-ink);
+}
+
+.captionRule {
+  width: 1.5rem;
+  height: var(--rule-hair);
+  background: var(--color-composer-rule-2);
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translate3d(0, 16px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* ================================================================ A11Y */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==================================================== SHARED  SECTIONS */
+
+.section {
+  position: relative;
+  z-index: var(--z-raised);
+  scroll-margin-top: var(--space-xl);
+  padding-block: clamp(var(--space-2xl), 9vw, var(--space-4xl));
+  background: var(--color-paper);
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+/* explanatory chapters get a quiet tonal band to set them apart */
+.sectionAlt {
+  background: var(--color-paper-2);
+}
+
+.sectionInner {
+  width: min(100% - 2 * var(--page-gutter), 1180px);
+  margin-inline: auto;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-ink-2);
+}
+
+.sectionTitle {
+  margin: var(--space-sm) 0 0;
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  color: var(--color-ink);
+}
+
+/* ============================================================= FEATURES */
+/* "Why Ghost Palette" — a stacked hairline list, not a card grid. */
+
+.featureList {
+  margin: clamp(var(--space-xl), 5vw, var(--space-2xl)) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--rule-hair) solid var(--color-rule-2);
+}
+
+.featureRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.5fr);
+  align-items: start;
+  gap: clamp(var(--space-md), 4vw, var(--space-2xl));
+  padding-block: clamp(var(--space-lg), 4vw, var(--space-xl));
+  border-bottom: var(--rule-hair) solid var(--color-rule-2);
+}
+
+.featureNum {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  padding-top: 0.35em;
+}
+
+.featureTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.featureBody {
+  margin: 0;
+  font-size: var(--text-md);
+  line-height: 1.55;
+  color: var(--color-ink-2);
+}
+
+/* =============================================================== ROSTER */
+/* "Models compared" — typographic hairline list with kind labels. */
+
+.rosterHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.rosterCount {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+.rosterList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rosterItem {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+.rosterItem:last-child {
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+}
+
+.rosterName {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+.rosterKind {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+/* ============================================================= HOW / FLOW */
+/* "How it works" — a call sheet: oversized ghost numerals strung along one
+   connecting rail with a sweeping playhead. Deliberately NOT three cards. */
+
+/* the first light chapter after the dark hero; own stacking context so the
+   rail, nodes and sweeping playhead compose against the section, not the page */
+.how {
+  isolation: isolate;
+}
+
+.howHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: clamp(var(--space-2xl), 6vw, var(--space-3xl));
+}
+
+.howTitle {
+  margin: 0;
+  max-width: 18ch;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+.howTitle em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.flow {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(var(--space-lg), 4vw, var(--space-3xl));
+  margin: 0;
+  padding-top: var(--space-2xl);
+  list-style: none;
+  border-top: var(--rule-hair) solid var(--color-rule-2);
+}
+
+/* the scrubbing playhead — a soft bright segment sweeping along the rail */
+.flowPlayhead {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26%;
+  height: calc(var(--rule-hair) * 2);
+  transform: translateY(-50%);
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--color-ink) 50%,
+    transparent 100%
+  );
+  animation: playhead 7s var(--ease-in-out) infinite alternate;
+  will-change: transform;
+}
+
+@keyframes playhead {
+  from { transform: translate(0, -50%); }
+  to   { transform: translate(284%, -50%); }
+}
+
+.flowStep {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* a diamond tick sitting on the rail, marking the start of each move */
+.flowNode {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  transform: translateY(-50%) rotate(45deg);
+  background: var(--color-ink);
+}
+
+.flowNumeral {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 9vw, 6rem);
+  font-weight: 600;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--color-rule-2);
+}
+
+.flowStage {
+  margin-top: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-ink-2);
+}
+
+.flowName {
+  margin: var(--space-xs) 0 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.flowBody {
+  margin: var(--space-sm) 0 0;
+  max-width: 32ch;
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--color-ink-2);
+  text-wrap: pretty;
+}
+
+/* =============================================================== FRAMES */
+/* The actual output, presented like a contact sheet on a lightbox: a dark
+   band so the (only) color on the page — the generated stills — carries it.
+   A horizontally-scrollable film strip with mono frame numbers. */
+
+.frames {
+  position: relative;
+  z-index: var(--z-raised);
+  scroll-margin-top: var(--space-xl);
+  padding-block: clamp(var(--space-2xl), 9vw, var(--space-4xl));
+  background: var(--color-composer-paper);
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+.framesInner {
+  width: min(100% - 2 * var(--page-gutter), 1180px);
+  margin-inline: auto;
+}
+
+.framesHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-lg);
+  margin-bottom: clamp(var(--space-xl), 5vw, var(--space-2xl));
+}
+
+.framesEyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-composer-ink);
+}
+
+.framesMeta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-composer-muted);
+}
+
+.stripWrap {
+  position: relative;
+}
+
+/* sprocket perforations bracketing the strip — token dots, no hue */
+.stripWrap::before,
+.stripWrap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8px;
+  z-index: var(--z-raised);
+  pointer-events: none;
+  background-image: radial-gradient(var(--color-composer-rule-2) 1px, transparent 1.6px);
+  background-size: 18px 8px;
+  background-position: var(--page-gutter) center;
+  opacity: 0.7;
+}
+
+.stripWrap::before { top: 0; }
+.stripWrap::after { bottom: 0; }
+
+.strip {
+  display: flex;
+  gap: clamp(var(--space-md), 3vw, var(--space-xl));
+  margin: 0;
+  padding: var(--space-lg) var(--page-gutter);
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--page-gutter);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+.strip:focus-visible {
+  outline: 2px solid var(--color-art-spec);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.frameCell {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: clamp(15rem, 56vw, 21rem);
+}
+
+/* editorial rhythm — frames vary in proportion, not a uniform grid */
+.frameCell:nth-child(1) { width: clamp(20rem, 82vw, 34rem); }
+.frameCell:nth-child(1) .frameWell { aspect-ratio: 16 / 10; }
+.frameCell:nth-child(2) { width: clamp(13rem, 50vw, 17rem); }
+.frameCell:nth-child(2) .frameWell { aspect-ratio: 3 / 4; }
+.frameCell:nth-child(3) .frameWell { aspect-ratio: 1 / 1; }
+.frameCell:nth-child(4) { width: clamp(17rem, 64vw, 24rem); }
+.frameCell:nth-child(4) .frameWell { aspect-ratio: 4 / 3; }
+.frameCell:nth-child(5) { width: clamp(13rem, 50vw, 17rem); }
+.frameCell:nth-child(5) .frameWell { aspect-ratio: 3 / 4; }
+.frameCell:nth-child(6) { width: clamp(19rem, 72vw, 28rem); }
+.frameCell:nth-child(6) .frameWell { aspect-ratio: 16 / 10; }
+.frameCell:nth-child(7) .frameWell { aspect-ratio: 1 / 1; }
+.frameCell:nth-child(8) { width: clamp(17rem, 64vw, 24rem); }
+.frameCell:nth-child(8) .frameWell { aspect-ratio: 4 / 3; }
+
+.frameFig {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.frameWell {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  border: var(--rule-hair) solid var(--color-composer-rule);
+  background: var(--color-composer-paper-2);
+  box-shadow: 0 18px 50px var(--color-composer-shadow);
+}
+
+.frameWell img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-long) var(--ease-out);
+  will-change: transform;
+}
+
+.frameFig:hover .frameWell img {
+  transform: scale(1.04);
+}
+
+.frameCap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding-inline: var(--space-3xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+}
+
+.frameIndex {
+  color: var(--color-composer-ink);
+}
+
+.frameTag {
+  text-transform: uppercase;
+  color: var(--color-composer-muted);
+}
+
+/* edge fades signal "there is more to scroll" — token-based, no hue */
+.stripFadeStart,
+.stripFadeEnd {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(2rem, 8vw, 6rem);
+  z-index: calc(var(--z-raised) + 1);
+  pointer-events: none;
+}
+
+.stripFadeStart {
+  left: 0;
+  background: linear-gradient(to right, var(--color-composer-paper), transparent);
+}
+
+.stripFadeEnd {
+  right: 0;
+  background: linear-gradient(to left, var(--color-composer-paper), transparent);
+}
+
+/* ============================================================== CLOSING */
+
+.closing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-xl);
+  padding: var(--space-4xl) var(--page-gutter);
+  background: var(--color-paper);
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+.closingLine {
+  margin: 0;
+  max-width: 40rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-2xl);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: var(--color-ink);
+}
+
+.closingLine em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.closingCta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 2.75rem;
+  padding: var(--space-sm) var(--space-lg);
+  border: var(--rule-hair) solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform var(--dur-short) var(--ease-out),
+    box-shadow var(--dur-short) var(--ease-out);
+}
+
+.closingCta svg {
+  transition: transform var(--dur-short) var(--ease-out);
+}
+
+.closingCta:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-panel);
+}
+
+.closingCta:hover svg {
+  transform: translate3d(2px, -2px, 0);
+}
+
+.closingCta:active {
+  transform: translateY(0);
+}
+
+.closingCta:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* ================================================ FOOTER CONTINUITY (bug #3)
+   The site footer (global, styled in globals.css) is transparent and carries
+   margin-top: var(--space-3xl). That 6rem of bare page surface between the
+   last full-width band and the centered footer reads as a separate lighter
+   strip at the page bottom. Pull the footer flush and paint it on the same
+   paper as the closing band so the bottom is one continuous color. */
+.page :global(.gp-sitefooter) {
+  margin-top: 0;
+  background: var(--color-paper);
+}
+
+/* =========================================================== RESPONSIVE */
+
+@media (max-width: 860px) {
+  .featureRow {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+  }
+  .featureNum {
+    padding-top: 0;
+  }
+  /* the call sheet stacks: rail becomes a per-step top rule, playhead retires */
+  .flow {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+    padding-top: 0;
+    border-top: 0;
+  }
+  .flowPlayhead {
+    display: none;
+  }
+  .flowStep {
+    padding-top: var(--space-lg);
+    border-top: var(--rule-hair) solid var(--color-rule-2);
+  }
+  .flowNumeral {
+    font-size: clamp(3rem, 17vw, 4.5rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .nowShowing {
+    margin-top: var(--space-xl);
+  }
+}
+
+/* ==================================================== RESTRAINED REVEAL */
+/* Progressive enhancement only: the hidden start state is applied solely
+   where scroll-driven animation is supported AND motion is welcome, so
+   unsupported browsers / reduced-motion users always see content. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .featureRow,
+    .rosterItem,
+    .flowStep,
+    .frameCell {
+      animation: revealUp linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+    @keyframes revealUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
+}
+
+/* ============================================= REDUCED MOTION: FREEZE */
+
+@media (prefers-reduced-motion: reduce) {
+  .frame,
+  .frame img,
+  .frame video,
+  .caption,
+  .grain,
+  .scanline,
+  .recDot,
+  .heroKicker,
+  .heroTitle,
+  .heroLede,
+  .heroActions,
+  .flowPlayhead {
+    animation: none !important;
+  }
+  /* park the playhead at the rail start; freeze frame hover-zoom */
+  .flowPlayhead {
+    transform: translate(0, -50%);
+  }
+  .frameWell img {
+    transition: none;
+  }
+  /* freeze the reel to a single still + first caption */
+  .frame {
+    opacity: 0;
+  }
+  .frame:first-child {
+    opacity: 1;
+  }
+  .frame:first-child img,
+  .frame:first-child video {
+    transform: scale(1.04);
+  }
+  .caption {
+    opacity: 0;
+  }
+  .caption:first-child {
+    opacity: 1;
+  }
+  .heroKicker,
+  .heroTitle,
+  .heroLede,
+  .heroActions {
+    opacity: 1;
+    transform: none;
+  }
+  .cta,
+  .closingCta {
+    transition: none;
+  }
+}
+
+/* ---- Output gallery — asymmetric mosaic of existing cross-model samples ---- */
+.galleryHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.mosaic {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 11rem;
+  grid-auto-flow: dense;
+  gap: var(--space-sm);
+}
+
+.mosaicCell {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+  background: var(--color-paper-2);
+}
+
+.mosaicCell img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-long) var(--ease-out);
+}
+
+.mosaicCell:hover img {
+  transform: scale(1.04);
+}
+
+/* asymmetry — a feature tile and a wide tile break the grid */
+.mosaicCell:nth-child(1) {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.mosaicCell:nth-child(6) {
+  grid-column: span 2;
+}
+
+.mosaicCap {
+  position: absolute;
+  left: var(--space-xs);
+  bottom: var(--space-xs);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-paper);
+  background: color-mix(in oklab, var(--color-ink), transparent 22%);
+}
+
+@media (max-width: 860px) {
+  .mosaic {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 9rem;
+  }
+  .mosaicCell:nth-child(1) {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+  .mosaicCell:nth-child(6) {
+    grid-column: span 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mosaicCell img {
+    transition: none;
+  }
+  .mosaicCell:hover img {
+    transform: none;
+  }
+}

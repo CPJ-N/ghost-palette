@@ -1,0 +1,507 @@
+/* Living comparison wall — landing variant.
+   Strictly grayscale chrome; all color comes from the sample images.
+   Tokens only: var(--color-*), var(--text-*), var(--space-*), var(--font-*),
+   var(--ease-*), radii/shadows. No raw hex/hue/chroma. */
+
+.page {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+/* Visible focus everywhere, even if a global reset stripped it. */
+.page a:focus-visible,
+.page button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* ---------------------------------------------------------------- HERO */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: clamp(620px, 88vh, 960px);
+  display: grid;
+  align-items: center;
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+}
+
+/* The kinetic wall — a full-bleed mosaic of model renders, clipped by the hero. */
+.wall {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(118px, 15vw, 196px), 1fr));
+  grid-auto-rows: auto;
+  gap: clamp(6px, 0.8vw, 12px);
+  padding: clamp(6px, 0.8vw, 12px);
+  background: var(--color-paper-3);
+}
+
+.tile {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--color-paper-4);
+  /* Pre-animation resting state = blurred/dim so first paint reads "rendering". */
+  opacity: 0.4;
+  transform: scale(1.05);
+  filter: blur(9px);
+  animation: tileShuffle var(--tile-dur, 17s) var(--ease-in-out) infinite;
+  animation-delay: calc(var(--i) * -0.9s);
+  will-change: opacity, transform, filter;
+}
+
+.tileImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 45%;
+  animation: tilePan var(--pan-dur, 22s) var(--ease-in-out) infinite;
+  animation-delay: calc(var(--i) * -1.3s);
+}
+
+/* De-synchronise the wall so it reads as continuously living, not looping. */
+.tile:nth-child(3n) {
+  --tile-dur: 19s;
+}
+.tile:nth-child(3n + 1) {
+  --tile-dur: 15s;
+}
+.tile:nth-child(5n) {
+  --tile-dur: 21s;
+}
+.tile:nth-child(4n) {
+  --pan-dur: 27s;
+}
+.tile:nth-child(7n) {
+  --pan-dur: 18s;
+}
+
+/* Vary crops so recycled images look distinct across the wall. */
+.tile:nth-child(2n) .tileImg {
+  object-position: 38% 55%;
+}
+.tile:nth-child(3n) .tileImg {
+  object-position: 62% 40%;
+}
+.tile:nth-child(5n) .tileImg {
+  object-position: 50% 66%;
+}
+.tile:nth-child(7n + 2) .tileImg {
+  object-position: 30% 35%;
+}
+
+@keyframes tileShuffle {
+  0% {
+    opacity: 0.35;
+    transform: scale(1.06);
+    filter: blur(9px);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  76% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  88% {
+    opacity: 0.5;
+    transform: scale(1.03);
+    filter: blur(7px);
+  }
+  100% {
+    opacity: 0.35;
+    transform: scale(1.06);
+    filter: blur(9px);
+  }
+}
+
+/* Slow object-position drift = gentle "video frame" motion. */
+@keyframes tilePan {
+  0%,
+  100% {
+    object-position: 50% 42%;
+  }
+  50% {
+    object-position: 50% 58%;
+  }
+}
+
+/* Edge vignette so the wall fades into the nav above and page below, plus a
+   mild overall dim so the title placard reads as the focal point. */
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to bottom,
+      var(--color-paper) 0%,
+      color-mix(in oklab, var(--color-paper) 0%, transparent) 16%
+    ),
+    linear-gradient(
+      to top,
+      var(--color-paper) 0%,
+      color-mix(in oklab, var(--color-paper) 0%, transparent) 24%
+    ),
+    color-mix(in oklab, var(--color-paper) 20%, transparent);
+}
+
+/* The title card — a solid, full-bleed placard stamped across the wall.
+   Solid paper guarantees text contrast; the wall reads above and below it. */
+.placard {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  background: var(--color-paper);
+  border-top: var(--rule-hair) solid var(--color-rule-2);
+  border-bottom: var(--rule-hair) solid var(--color-rule-2);
+  padding-block: clamp(var(--space-xl), 6vw, var(--space-3xl));
+  box-shadow: var(--shadow-panel);
+}
+
+.placardInner {
+  width: min(100% - 2 * var(--page-gutter), 1180px);
+  margin-inline: auto;
+}
+
+.eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-sm);
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  color: var(--color-ink-2);
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-ink);
+}
+
+.liveDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-ink);
+  animation: livePulse 1.8s var(--ease-in-out) infinite;
+}
+
+@keyframes livePulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+.sep {
+  color: var(--color-neutral);
+}
+
+.prompt {
+  color: var(--color-ink-2);
+  max-width: 60ch;
+}
+
+.headline {
+  display: grid;
+  margin: 0 0 var(--space-lg);
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+}
+
+.headlineLine {
+  color: var(--color-ink);
+}
+
+/* Tonal "accent" — grayscale, via weight of gray, never hue. */
+.headlineAccent {
+  color: var(--color-muted);
+}
+
+.lede {
+  max-width: 52ch;
+  margin: 0;
+  font-size: var(--text-md);
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: clamp(var(--space-lg), 3vw, var(--space-xl));
+}
+
+/* Model rail — a slow marquee of the roster pinned to the hero's lower edge. */
+.rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--color-paper) 94%, transparent);
+  border-top: var(--rule-hair) solid var(--color-rule-2);
+  backdrop-filter: blur(6px);
+}
+
+.railViewport {
+  display: flex;
+  width: max-content;
+  animation: railScroll 38s linear infinite;
+}
+
+.railTrack {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin: 0;
+  padding: var(--space-sm) 0 var(--space-sm) var(--space-lg);
+  list-style: none;
+}
+
+.railItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+.railItem::after {
+  content: "·";
+  color: var(--color-neutral);
+}
+
+@keyframes railScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ------------------------------------------------------- SHARED SECTIONS */
+
+.section {
+  padding-block: clamp(var(--space-2xl), 9vw, var(--space-4xl));
+}
+
+.inner {
+  width: min(100% - 2 * var(--page-gutter), 1180px);
+  margin-inline: auto;
+}
+
+.kicker {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-ink-2);
+}
+
+.sectionTitle {
+  margin: var(--space-sm) 0 0;
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  color: var(--color-ink);
+}
+
+/* ----------------------------------------------------------- HOW IT WORKS */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(var(--space-lg), 4vw, var(--space-2xl));
+  margin: clamp(var(--space-xl), 5vw, var(--space-2xl)) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.step {
+  display: grid;
+  gap: var(--space-xs);
+  padding-top: var(--space-md);
+  border-top: var(--rule-hair) solid var(--color-ink);
+}
+
+.stepN {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.stepTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--color-ink);
+}
+
+.stepBody {
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+/* --------------------------------------------------------------- FEATURES */
+
+.features {
+  border-top: var(--rule-hair) solid var(--color-rule);
+  background: var(--color-paper-2);
+}
+
+.featureList {
+  margin: clamp(var(--space-xl), 5vw, var(--space-2xl)) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--rule-hair) solid var(--color-rule-2);
+}
+
+.featureRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.5fr);
+  align-items: start;
+  gap: clamp(var(--space-md), 4vw, var(--space-2xl));
+  padding-block: clamp(var(--space-lg), 4vw, var(--space-xl));
+  border-bottom: var(--rule-hair) solid var(--color-rule-2);
+}
+
+.featureNum {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  padding-top: 0.35em;
+}
+
+.featureTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.featureBody {
+  margin: 0;
+  font-size: var(--text-md);
+  line-height: 1.55;
+  color: var(--color-ink-2);
+}
+
+/* ------------------------------------------------------------- CLOSING CTA */
+
+.cta {
+  padding-block: clamp(var(--space-3xl), 12vw, var(--space-4xl));
+  border-top: var(--rule-hair) solid var(--color-rule);
+  text-align: center;
+}
+
+.ctaTitle {
+  margin: 0 auto;
+  max-width: 18ch;
+  font-family: var(--font-display);
+  font-size: var(--text-display-s);
+  font-weight: 600;
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+}
+
+.ctaActions {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(var(--space-lg), 3vw, var(--space-xl));
+}
+
+/* ----------------------------------------------------------- RESPONSIVE */
+
+@media (max-width: 860px) {
+  .steps {
+    grid-template-columns: 1fr;
+  }
+  .featureRow {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+  }
+  .featureNum {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    min-height: clamp(560px, 92vh, 760px);
+  }
+}
+
+/* ------------------------------------------------------- REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .tileImg,
+  .liveDot,
+  .railViewport {
+    animation: none !important;
+  }
+  .tile {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  .tileImg {
+    object-position: 50% 50%;
+  }
+  /* Hide the marquee clone and let the single roster scroll if it overflows. */
+  .railViewport {
+    width: 100%;
+  }
+  .railTrack[aria-hidden="true"] {
+    display: none;
+  }
+  .rail {
+    overflow-x: auto;
+  }
+}
