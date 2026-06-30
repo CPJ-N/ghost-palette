@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { createId } from "@/lib/domain";
 import { createLogger } from "@/lib/logger";
+import { getModel } from "@/lib/models";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/types";
 import type { GenerationResult, GenerationStatus, RunMode, SavedRun } from "@/lib/types";
@@ -36,8 +37,9 @@ export type PersistRunInput = {
 /**
  * Persist one run + its results. For every result with an http(s) URL we fetch
  * the bytes server-side and upload them to the "artifacts" Storage bucket at
- * `${userId}/${runId}/${resultId}.png`, recording that path on the row. A single
- * image fetch/upload failure never fails the run — the row is stored with a null
+ * `${userId}/${runId}/${resultId}.{png|mp4}` (extension/contentType derived from
+ * the model kind — image vs video), recording that path on the row. A single
+ * media fetch/upload failure never fails the run — the row is stored with a null
  * `storage_path` instead.
  */
 export async function persistRun(
@@ -70,12 +72,15 @@ export async function persistRun(
   const rows = await Promise.all(
     input.results.map(async (result) => {
       const resultId = createId("result");
-      const storagePath = await uploadResultImage(
+      const isVideo = getModel(result.modelId).kind === "video";
+      const storagePath = await uploadResultMedia(
         sb,
         input.userId,
         runId,
         resultId,
         result.url,
+        isVideo ? "mp4" : "png",
+        isVideo ? "video/mp4" : "image/png",
       );
       return {
         id: resultId,
@@ -220,34 +225,36 @@ function isAllowedImageUrl(raw: string): boolean {
   );
 }
 
-async function uploadResultImage(
+async function uploadResultMedia(
   sb: Admin,
   userId: string,
   runId: string,
   resultId: string,
   url: string | null | undefined,
+  extension: string,
+  contentType: string,
 ): Promise<string | null> {
   if (!url || !isAllowedImageUrl(url)) return null;
 
   try {
     const response = await fetch(url, { redirect: "error" });
     if (!response.ok) {
-      log.warn("image.fetch_failed", { runId, resultId, status: response.status });
+      log.warn("media.fetch_failed", { runId, resultId, status: response.status });
       return null;
     }
     const bytes = Buffer.from(await response.arrayBuffer());
-    const path = `${userId}/${runId}/${resultId}.png`;
+    const path = `${userId}/${runId}/${resultId}.${extension}`;
     const { error } = await sb.storage.from(ARTIFACTS_BUCKET).upload(path, bytes, {
-      contentType: "image/png",
+      contentType,
       upsert: true,
     });
     if (error) {
-      log.warn("image.upload_failed", { runId, resultId, message: error.message });
+      log.warn("media.upload_failed", { runId, resultId, message: error.message });
       return null;
     }
     return path;
   } catch (error) {
-    log.warn("image.persist_error", {
+    log.warn("media.persist_error", {
       runId,
       resultId,
       message: error instanceof Error ? error.message : String(error),

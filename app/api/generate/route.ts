@@ -109,6 +109,7 @@ export async function POST(request: Request) {
       prompt,
       seed: body.seed,
       imageUrl: body.imageUrl,
+      kind: model.kind,
     });
 
     log.info("generate.success", {

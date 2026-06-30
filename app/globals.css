@@ -1091,6 +1091,14 @@
   }
 }
 
+/* Video results reuse the blur-up reveal. The .gp-art__img rules above are
+   element-agnostic (class selector), so a <video class="gp-art__img"> already
+   covers the tile (object-fit: cover, absolute inset-0) and honours
+   prefers-reduced-motion; this just guarantees block layout for the element. */
+.gp-art video.gp-art__img {
+  display: block;
+}
+
 /* ───────── Arena / Evals ───────── */
 .gp-result.is-winner {
   border-color: var(--color-accent);
@@ -4094,6 +4102,19 @@
 .gp-composer-dock__pill:hover {
   border-color: var(--color-rule-2);
   background: var(--color-paper-4);
+}
+
+/* Image/Video segmented toggle — reuses the pill chrome; the active pill inverts
+   to the accent (same treatment as the billing toggle). */
+.gp-composer-dock__segment {
+  display: inline-flex;
+  gap: var(--space-2xs);
+}
+
+.gp-composer-dock__pill.is-active {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
 }
 
 .gp-composer-dock__stepper {

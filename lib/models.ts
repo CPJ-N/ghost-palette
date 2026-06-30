@@ -10,6 +10,8 @@ export type ModelDefinition = {
   adapter: string;
   creditCost: number;
   artClass: string;
+  /** Output media type. Undefined means "image". */
+  kind?: "image" | "video";
   /** Internal models (dev-only or non-commercially-licensed) are usable only in
    *  local development — hidden from the picker and rejected by the generate API
    *  in production. Gated via the built-in NODE_ENV, so there is no flag to set. */
@@ -83,9 +85,52 @@ export const MODELS: ModelDefinition[] = [
     creditCost: 4,
     artClass: "art-ideogram",
   },
+  // Video adapters + creditCosts — verify against fal's live catalog/pricing; Kling endpoints confirmed, Luma/MiniMax verify.
+  {
+    id: "kling-2.6-pro",
+    name: "Kling 2.6 Pro",
+    provider: "fal",
+    description: "Kling's flagship text-to-video — cinematic motion and high fidelity.",
+    adapter: "fal-ai/kling-video/v2.6/pro/text-to-video",
+    creditCost: 30,
+    artClass: "art-sd35",
+    kind: "video",
+  },
+  {
+    id: "kling-2.5-turbo",
+    name: "Kling 2.5 Turbo",
+    provider: "fal",
+    description: "Faster Kling text-to-video — quick iteration with strong motion.",
+    adapter: "fal-ai/kling-video/v2.5-turbo/pro/text-to-video",
+    creditCost: 18,
+    artClass: "art-sd35",
+    kind: "video",
+  },
+  {
+    id: "luma-dream",
+    name: "Luma Dream Machine",
+    provider: "fal",
+    description: "Luma's Dream Machine — fluid, naturalistic text-to-video.",
+    adapter: "fal-ai/luma-dream-machine",
+    creditCost: 18,
+    artClass: "art-sd35",
+    kind: "video",
+  },
+  {
+    id: "minimax-hailuo",
+    name: "MiniMax Hailuo 02",
+    provider: "fal",
+    description: "MiniMax Hailuo 02 — expressive text-to-video generation.",
+    adapter: "fal-ai/minimax/hailuo-02/standard/text-to-video",
+    creditCost: 20,
+    artClass: "art-sd35",
+    kind: "video",
+  },
 ];
 
 export const DEFAULT_SELECTION = ["flux2-pro", "flux2-dev"];
+
+export const DEFAULT_VIDEO_SELECTION = ["kling-2.6-pro"];
 
 // Internal models (just-released or non-commercially-licensed) are available only
 // outside production. Keyed off the built-in NODE_ENV — local `pnpm dev` runs as
