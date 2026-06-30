@@ -3,6 +3,7 @@
 import {
   ArrowUp,
   ChevronDown,
+  CloudOff,
   ImagePlus,
   Layers,
   Loader2,
@@ -13,15 +14,13 @@ import {
   Type,
   Undo2,
 } from "lucide-react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { RefineCompare } from "@/components/refine-compare";
-import { SaveRunButton } from "@/components/save-run-button";
 import { createId, hashSeed } from "@/lib/domain";
 import { generateOne } from "@/lib/generate";
 import { getModel } from "@/lib/models";
 import { structuralSimilarity } from "@/lib/similarity";
-import type { GenerationResult } from "@/lib/types";
 
 const TIERS = {
   classic: { label: "Classic", modelId: "flux2-dev" },
@@ -39,6 +38,8 @@ type ChatTurn = {
   status: "generating" | "complete" | "error";
   error?: string;
   createdAt: string;
+  /** False when the generation succeeded but the durable save failed. */
+  persisted?: boolean;
 };
 
 export default function EvalsPage() {
@@ -46,6 +47,8 @@ export default function EvalsPage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [referenceSrc, setReferenceSrc] = useState<string | null>(null);
   const [sessionName, setSessionName] = useState("Untitled");
+  // One run id per Refine session — every turn in this session groups under it.
+  const [sessionRunId] = useState(() => createId("run"));
   const [tier, setTier] = useState<Tier>("premium");
   const [canvasInfluence, setCanvasInfluence] = useState(60);
   const [draft, setDraft] = useState("");
@@ -60,22 +63,6 @@ export default function EvalsPage() {
   const activeTurn = completedTurns[renderIndex];
   const activeOutput = activeTurn?.imageUrl ?? null;
   const pendingTurn = turns.find((t) => t.status === "generating");
-
-  const saveResults: GenerationResult[] = useMemo(
-    () =>
-      completedTurns.map((turn) => ({
-        id: turn.id,
-        runId: "refine-session",
-        modelId: turn.modelId,
-        prompt: turn.prompt,
-        createdAt: turn.createdAt,
-        status: "complete" as const,
-        favorite: false,
-        url: turn.imageUrl,
-        seed: hashSeed(`${turn.prompt}-${turn.modelId}`),
-      })),
-    [completedTurns],
-  );
 
   const onReference = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -123,6 +110,9 @@ export default function EvalsPage() {
       const data = await generateOne(modelId, `${trimmed}${influenceNote}`, {
         imageUrl: canvasInfluence > 0 ? referenceSrc : undefined,
         seed: hashSeed(`${trimmed}-${modelId}-${canvasInfluence}`),
+        runId: sessionRunId,
+        resultId: turnId,
+        mode: "eval",
       });
       const score = await structuralSimilarity(referenceSrc, data.url);
 
@@ -134,6 +124,7 @@ export default function EvalsPage() {
                 status: "complete" as const,
                 imageUrl: data.url,
                 score,
+                persisted: data.persisted,
               }
             : turn,
         );
@@ -235,13 +226,6 @@ export default function EvalsPage() {
           <span className="gp-refine__zoom" aria-live="polite">
             {zoom}%
           </span>
-          {saveResults.length > 0 ? (
-            <SaveRunButton
-              mode="eval"
-              prompt={completedTurns.map((t) => t.prompt).join("\n")}
-              results={saveResults}
-            />
-          ) : null}
           <button type="button" className="gp-refine__menu" aria-label="View options">
             Split
             <ChevronDown size={14} aria-hidden="true" />
@@ -306,6 +290,15 @@ export default function EvalsPage() {
                       <span>{getModel(turn.modelId).name}</span>
                       {typeof turn.score === "number" ? (
                         <span className="gp-refine__score">{turn.score} match</span>
+                      ) : null}
+                      {turn.persisted === false ? (
+                        <span
+                          className="gp-refine__sync-state"
+                          title="Generated, but the durable save failed — this image may not appear in your Gallery."
+                        >
+                          <CloudOff size={13} aria-hidden="true" />
+                          Didn&apos;t sync
+                        </span>
                       ) : null}
                     </button>
                   ) : null}

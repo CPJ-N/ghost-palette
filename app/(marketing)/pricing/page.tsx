@@ -167,7 +167,7 @@ export default function PricingPage() {
                 <Check size={16} aria-hidden="true" /> Refinement workspace
               </li>
               <li>
-                <Check size={16} aria-hidden="true" /> Saved Library
+                <Check size={16} aria-hidden="true" /> Saved Gallery
               </li>
               <li>
                 <Check size={16} aria-hidden="true" /> Priority generation queue

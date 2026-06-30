@@ -12,7 +12,7 @@ const PRIMARY = [
 ];
 
 const SECONDARY = [
-  { href: "/library", label: "Library", icon: Library },
+  { href: "/gallery", label: "Gallery", icon: Library },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

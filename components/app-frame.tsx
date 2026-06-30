@@ -2,7 +2,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-// Single app shell for every workspace route (Create/studio, Refine, Library,
+// Single app shell for every workspace route (Create/studio, Refine, Gallery,
 // Settings) — sidebar + header + content area, so the studio matches the rest.
 export function AppFrame({ children }: { children: React.ReactNode }) {
   return (

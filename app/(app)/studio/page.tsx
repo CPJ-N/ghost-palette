@@ -3,15 +3,16 @@
 import {
   AlertTriangle,
   ArrowUp,
+  CloudOff,
   Loader2,
   Minus,
   Plus,
   Trophy,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
 
-import { SaveRunButton } from "@/components/save-run-button";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -37,8 +38,17 @@ import type { GenerationResult } from "@/lib/types";
 
 const MAX_BATCH_SIZE = 4;
 
-export default function ArenaPage() {
-  const [prompt, setPrompt] = useState("");
+export default function StudioPage() {
+  return (
+    <Suspense fallback={null}>
+      <StudioContent />
+    </Suspense>
+  );
+}
+
+function StudioContent() {
+  const searchParams = useSearchParams();
+  const [prompt, setPrompt] = useState(() => searchParams.get("prompt") ?? "");
   const [mediaType, setMediaType] = useState<"image" | "video">("image");
   const [selected, setSelected] = useState<string[]>(() =>
     DEFAULT_SELECTION.filter(isModelAvailable),
@@ -158,6 +168,9 @@ export default function ArenaPage() {
         try {
           const data = await generateOne(item.modelId, trimmed, {
             seed: item.seed,
+            runId,
+            resultId: item.id,
+            mode: "arena",
           });
           setResults((current) =>
             current.map((result) =>
@@ -168,6 +181,7 @@ export default function ArenaPage() {
                     url: data.url,
                     seed:
                       typeof data.seed === "number" ? data.seed : result.seed,
+                    persisted: data.persisted,
                   }
                 : result,
             ),
@@ -201,8 +215,29 @@ export default function ArenaPage() {
     await refreshCredits();
   }
 
+  async function pickWinner(result: GenerationResult) {
+    setWinnerId(result.id);
+    try {
+      const response = await fetch(`/api/runs/${result.runId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ winnerId: result.id }),
+      });
+      if (!response.ok) {
+        // Most commonly hit when the underlying result never finished saving
+        // (result.persisted === false) — there's no row server-side to mark
+        // as the winner. Revert the optimistic pick rather than let the UI
+        // permanently disagree with the database.
+        setWinnerId(null);
+        setRunError("Couldn't save your pick — try again.");
+      }
+    } catch {
+      setWinnerId(null);
+      setRunError("Couldn't save your pick — try again.");
+    }
+  }
+
   const allDone = results.length > 0 && results.every((r) => r.status !== "generating");
-  const hasCompleteResults = results.some((r) => r.status === "complete");
   const composerNotice =
     runError ??
     (hasInsufficientCredits
@@ -236,20 +271,12 @@ export default function ArenaPage() {
                   {allDone && isComparison && !winnerId
                     ? "Choose the output that best matches the prompt."
                     : allDone
-                      ? "Save the output or run another direction."
+                      ? "Pick a winner or run another direction."
                       : `${
                           results.filter((r) => r.status === "complete").length
                         } of ${results.length} ready…`}
                 </p>
               </div>
-              {winnerId || (allDone && hasCompleteResults) ? (
-                <SaveRunButton
-                  mode="arena"
-                  prompt={results[0]?.prompt ?? prompt}
-                  results={results}
-                  winnerId={winnerId ?? undefined}
-                />
-              ) : null}
             </div>
 
             <div className="gp-composer-studio__grid">
@@ -307,6 +334,15 @@ export default function ArenaPage() {
                           Failed
                         </span>
                       ) : null}
+                      {result.status === "complete" && result.persisted === false ? (
+                        <span
+                          className="gp-art__badge"
+                          title="Generated, but the durable save failed — this image may not appear in your Gallery."
+                        >
+                          <CloudOff size={13} aria-hidden="true" />
+                          Didn&apos;t sync
+                        </span>
+                      ) : null}
                       {isWinner ? (
                         <span className="gp-versus__crown">
                           <Trophy size={15} aria-hidden="true" /> Winner
@@ -322,9 +358,16 @@ export default function ArenaPage() {
                           className={`gp-button ${isWinner ? "gp-button--primary" : "gp-button--ghost"}`}
                           type="button"
                           onClick={() => {
-                            setWinnerId(result.id);
+                            void pickWinner(result);
                           }}
-                          disabled={Boolean(winnerId) && !isWinner}
+                          disabled={
+                            result.persisted === false || (Boolean(winnerId) && !isWinner)
+                          }
+                          title={
+                            result.persisted === false
+                              ? "This image hasn't finished saving yet"
+                              : undefined
+                          }
                         >
                           {isWinner ? "Winner" : "Pick"}
                         </Button>

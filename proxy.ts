@@ -7,6 +7,7 @@ const isProtected = createRouteMatcher([
   "/arena(.*)",
   "/evals(.*)",
   "/library(.*)",
+  "/gallery(.*)",
   "/settings(.*)",
 ]);
 

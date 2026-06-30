@@ -25,7 +25,7 @@ const PROCESS = [
   {
     n: "03",
     title: "Save",
-    body: "Keep the winner, the reference edits, and the model picks in your Library.",
+    body: "Every render, the winner, and the reference edits are saved automatically to your Gallery.",
   },
 ];
 

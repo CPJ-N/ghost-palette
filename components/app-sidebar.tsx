@@ -62,8 +62,8 @@ const evaluation = [
     description: "External rankings",
   },
   {
-    title: "Library",
-    url: "/library",
+    title: "Gallery",
+    url: "/gallery",
     icon: Library,
   },
 ];

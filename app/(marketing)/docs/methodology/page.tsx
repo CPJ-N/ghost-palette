@@ -42,9 +42,9 @@ const WORKFLOWS = [
     body: "Provide a reference direction and compare how each model interprets the same refinement instruction.",
   },
   {
-    title: "Library",
+    title: "Gallery",
     metric: "Reproducibility",
-    body: "Save runs with prompt, model, and outputs so decisions are documented and repeatable.",
+    body: "Every run is saved automatically with prompt, model, and outputs so decisions are documented and repeatable.",
   },
 ];
 

@@ -35,7 +35,7 @@ export function SiteFooter() {
             <p>Studio</p>
             <Link href="/studio">Create</Link>
             <Link href="/evals">Refine</Link>
-            <Link href="/library">Library</Link>
+            <Link href="/gallery">Gallery</Link>
           </div>
           <div>
             <p>Account</p>

@@ -16,9 +16,9 @@ const ROUTES: Record<string, { title: string; description: string }> = {
     title: "Refine",
     description: "Chat-driven edits with split before/after compare.",
   },
-  "/library": {
-    title: "Library",
-    description: "Saved runs, winners, and comparison history.",
+  "/gallery": {
+    title: "Gallery",
+    description: "Every design you've generated, saved automatically.",
   },
   "/settings": {
     title: "Settings",

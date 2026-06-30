@@ -11,16 +11,18 @@ export type GenerationResult = {
   status: GenerationStatus;
   favorite: boolean;
   seed: number;
-  /** Transient fal CDN URL (expires). */
+  /** Transient fal CDN URL (expires); re-signed Storage URL once persisted. */
   url?: string;
-  /** Durable copy in Blob (set on favorite / eval). */
-  blobUrl?: string;
+  /** False when the generation succeeded but the durable save failed. */
+  persisted?: boolean;
   width?: number;
   height?: number;
   error?: string;
 };
 
 export type RunMode = "composer" | "arena" | "eval";
+
+export const RUN_MODES: readonly RunMode[] = ["composer", "arena", "eval"];
 
 export type HistoryRun = {
   id: string;
@@ -30,7 +32,6 @@ export type HistoryRun = {
   results: GenerationResult[];
 };
 
-/** A run persisted locally until Supabase storage ships. */
 export type SavedRun = HistoryRun & {
   mode: RunMode;
   savedAt: string;

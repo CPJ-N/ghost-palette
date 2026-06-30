@@ -11,6 +11,8 @@ import {
 import { createId } from "@/lib/domain";
 import { runModel } from "@/lib/fal/client";
 import { isModelAvailable, MODELS } from "@/lib/models";
+import { persistResult } from "@/lib/runs-db";
+import { RUN_MODES, type RunMode } from "@/lib/types";
 
 // Generates ONE image. The client fires one request per (model × seed) so each
 // serverless invocation stays short and gives natural per-tile progress.
@@ -26,7 +28,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { modelId?: string; prompt?: string; seed?: number; imageUrl?: string };
+  let body: {
+    modelId?: string;
+    prompt?: string;
+    seed?: number;
+    imageUrl?: string;
+    runId?: string;
+    resultId?: string;
+    mode?: string;
+  };
   try {
     body = await request.json();
   } catch {
@@ -46,6 +56,20 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  // `mode` is required (not optional-and-silently-skipped) so persistence can
+  // never be quietly bypassed by a caller that forgets to pass it — every
+  // generation must be saveable by construction, not by caller discipline.
+  if (!RUN_MODES.includes(body.mode as RunMode)) {
+    logValidationError(log, "missing_or_invalid_mode", { mode: body.mode });
+    return NextResponse.json(
+      { error: "A valid mode is required" },
+      { status: 400 },
+    );
+  }
+  const mode = body.mode as RunMode;
+  const runId = body.runId ?? createId("run");
+  const resultId = body.resultId ?? createId("result");
 
   // Internal models (non-commercial / unreleased) are usable in local dev only —
   // reject them in production even if a client is modified to request one.
@@ -121,10 +145,27 @@ export async function POST(request: Request) {
       creditsBalance: balanceAfterDebit,
     });
 
+    const { persisted } = await persistResult({
+      runId,
+      resultId,
+      userId,
+      mode,
+      prompt,
+      modelId: model.id,
+      seed: result.seed,
+      status: "complete",
+      url: result.url,
+      width: result.width,
+      height: result.height,
+    });
+
     return NextResponse.json({
       ...result,
       creditsCharged: model.creditCost,
       creditsBalance: balanceAfterDebit,
+      runId,
+      resultId,
+      persisted,
     });
   } catch (error) {
     const balanceAfterRefund = await grantCredits(
@@ -148,11 +189,27 @@ export async function POST(request: Request) {
       refunded: balanceAfterRefund !== null,
     });
     const message = error instanceof Error ? error.message : "Generation failed";
+
+    const { persisted: errorPersisted } = await persistResult({
+      runId,
+      resultId,
+      userId,
+      mode,
+      prompt,
+      modelId: model.id,
+      seed: body.seed,
+      status: "error",
+      error: message,
+    });
+
     return NextResponse.json(
       {
         error: message,
         creditsRefunded: balanceAfterRefund !== null ? model.creditCost : 0,
         creditsBalance: balanceAfterRefund,
+        runId,
+        resultId,
+        persisted: errorPersisted,
       },
       { status: 502 },
     );
