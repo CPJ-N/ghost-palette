@@ -24,11 +24,10 @@ export default function TermsPage() {
         <section className="gp-legal-section">
           <p>
             These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use
-            of Ghost Palette (the &ldquo;Service&rdquo;), operated by{" "}
-            <strong>[Company Legal Name]</strong> (&ldquo;Ghost Palette,&rdquo;
-            &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;). By creating an
-            account or using the Service, you agree to these Terms. If you do not
-            agree, do not use the Service.
+            of Ghost Palette (the &ldquo;Service,&rdquo; &ldquo;we,&rdquo;
+            &ldquo;us,&rdquo; or &ldquo;our&rdquo;). By creating an account or using
+            the Service, you agree to these Terms. If you do not agree, do not use
+            the Service.
           </p>
         </section>
 
@@ -196,11 +195,9 @@ export default function TermsPage() {
         <section className="gp-legal-section">
           <h2>12. Governing Law</h2>
           <p>
-            These Terms are governed by the laws of{" "}
-            <strong>[Governing State/Country]</strong>, without regard to its
-            conflict-of-laws principles. Any dispute arising from these Terms or the
-            Service will be resolved in the courts located in{" "}
-            <strong>[Venue]</strong>, and you consent to their jurisdiction.
+            These Terms are governed by applicable law, without regard to
+            conflict-of-laws principles. Any dispute arising from these Terms or
+            the Service will be resolved in a court of competent jurisdiction.
           </p>
         </section>
 
