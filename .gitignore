@@ -52,3 +52,6 @@ next-env.d.ts
 supabase/.temp
 supabase/.branches
 supabase/.env
+
+# local agent memory / scratch
+.claude/
