@@ -132,14 +132,6 @@ export default function MarketingPage() {
           <div className={styles.grain} />
         </div>
 
-        <div className={styles.hud} aria-hidden="true">
-          <span className={styles.hudTopLeft}>Reel · image + video models</span>
-          <span className={styles.hudTopRight}>
-            <span className={styles.recDot} />
-            Live
-          </span>
-        </div>
-
         <div className={styles.heroInner}>
           <p className={styles.heroKicker}>The evaluation layer for image &amp; video models</p>
           <h1 id="home-hero-title" className={styles.heroTitle}>
