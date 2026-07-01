@@ -2,12 +2,19 @@
 
 import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
+import posthog from "posthog-js";
 
 import { Button } from "@/components/ui/button";
 
 export function SettingsAppearanceContent() {
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
+
+  function toggleTheme() {
+    const next = isDark ? "light" : "dark";
+    setTheme(next);
+    posthog.capture("theme_changed", { theme: next });
+  }
 
   return (
     <section className="gp-settings-panel">
@@ -19,7 +26,7 @@ export function SettingsAppearanceContent() {
       <div className="gp-settings-actions">
         <Button
           variant="outline"
-          onClick={() => setTheme(isDark ? "light" : "dark")}
+          onClick={toggleTheme}
         >
           {isDark ? <SunIcon /> : <MoonIcon />}
           Switch to {isDark ? "light" : "dark"} mode

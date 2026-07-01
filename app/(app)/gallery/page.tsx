@@ -2,6 +2,7 @@
 
 import { AlertTriangle, Download, RotateCw, Search, Trash2, Wand2 } from "lucide-react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -82,6 +83,7 @@ export default function GalleryPage() {
   }, []);
 
   async function handleDelete(id: string) {
+    posthog.capture("run_deleted", { run_id: id });
     setRuns((current) => (current ? current.filter((run) => run.id !== id) : current));
     try {
       const response = await fetch(`/api/runs/${id}`, { method: "DELETE" });
@@ -311,14 +313,28 @@ export default function GalleryPage() {
             <div className="gp-library__dialog-actions">
               {activeResult.url ? (
                 <Button asChild variant="outline" size="lg" className="gp-button gp-button--outline">
-                  <a href={activeResult.url} download>
+                  <a
+                    href={activeResult.url}
+                    download
+                    onClick={() =>
+                      posthog.capture("image_downloaded", {
+                        result_id: activeResult.id,
+                        model_id: activeResult.modelId,
+                      })
+                    }
+                  >
                     <Download size={16} aria-hidden="true" />
                     Download
                   </a>
                 </Button>
               ) : null}
               <Button asChild variant="outline" size="lg" className="gp-button gp-button--outline">
-                <Link href={`/studio?prompt=${encodeURIComponent(activeResult.prompt)}`}>
+                <Link
+                  href={`/studio?prompt=${encodeURIComponent(activeResult.prompt)}`}
+                  onClick={() =>
+                    posthog.capture("prompt_reused", { result_id: activeResult.id })
+                  }
+                >
                   <Wand2 size={16} aria-hidden="true" />
                   Use this prompt again
                 </Link>

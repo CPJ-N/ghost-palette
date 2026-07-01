@@ -14,6 +14,7 @@ import {
   Type,
   Undo2,
 } from "lucide-react";
+import posthog from "posthog-js";
 import { useCallback, useRef, useState } from "react";
 
 import { RefineCompare } from "@/components/refine-compare";
@@ -91,6 +92,13 @@ export default function EvalsPage() {
       canvasInfluence >= 50
         ? " Preserve the composition and structure of the reference image."
         : "";
+
+    posthog.capture("refine_turn_started", {
+      model_id: modelId,
+      tier,
+      canvas_influence: canvasInfluence,
+      turn_number: turns.length + 1,
+    });
 
     setDraft("");
     setIsRunning(true);

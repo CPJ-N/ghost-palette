@@ -157,21 +157,6 @@ export async function POST(request: Request) {
       creditsBalance: balanceAfterDebit,
     });
 
-    const posthog = getPostHogClient();
-    posthog.capture({
-      distinctId: userId,
-      event: "image_generation_completed",
-      properties: {
-        model_id: model.id,
-        run_id: runId,
-        result_id: resultId,
-        mode,
-        latency_ms: latencyMs,
-        credit_cost: model.creditCost,
-        credits_balance: balanceAfterDebit,
-      },
-    });
-
     const { persisted } = await persistResult({
       runId,
       resultId,
@@ -184,6 +169,25 @@ export async function POST(request: Request) {
       url: result.url,
       width: result.width,
       height: result.height,
+    });
+
+    // Captured after persistResult resolves (not before) so `persisted`
+    // reflects whether the generation actually landed durably, not just
+    // whether the provider call succeeded.
+    const posthog = getPostHogClient();
+    posthog.capture({
+      distinctId: userId,
+      event: "image_generation_completed",
+      properties: {
+        model_id: model.id,
+        run_id: runId,
+        result_id: resultId,
+        mode,
+        latency_ms: latencyMs,
+        credit_cost: model.creditCost,
+        credits_balance: balanceAfterDebit,
+        persisted,
+      },
     });
 
     return NextResponse.json({
@@ -217,19 +221,6 @@ export async function POST(request: Request) {
       refunded: balanceAfterRefund !== null,
     });
     const message = error instanceof Error ? error.message : "Generation failed";
-    const posthogErr = getPostHogClient();
-    posthogErr.capture({
-      distinctId: userId,
-      event: "image_generation_failed",
-      properties: {
-        model_id: model.id,
-        run_id: runId,
-        result_id: resultId,
-        mode,
-        latency_ms: failLatencyMs,
-        refunded: balanceAfterRefund !== null,
-      },
-    });
 
     const { persisted: errorPersisted } = await persistResult({
       runId,
@@ -241,6 +232,21 @@ export async function POST(request: Request) {
       seed: body.seed,
       status: "error",
       error: message,
+    });
+
+    const posthogErr = getPostHogClient();
+    posthogErr.capture({
+      distinctId: userId,
+      event: "image_generation_failed",
+      properties: {
+        model_id: model.id,
+        run_id: runId,
+        result_id: resultId,
+        mode,
+        latency_ms: failLatencyMs,
+        refunded: balanceAfterRefund !== null,
+        persisted: errorPersisted,
+      },
     });
 
     return NextResponse.json(

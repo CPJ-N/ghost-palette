@@ -4,6 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { Check, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useState } from "react";
 
 import { MarketingNav } from "@/components/marketing-nav";
@@ -53,6 +54,12 @@ export default function PricingPage() {
       return;
     }
 
+    posthog.capture("checkout_started", {
+      plan,
+      credits,
+      interval,
+      lookup_key: key,
+    });
     setBusyPlan(key);
     setError(null);
     try {
@@ -92,14 +99,20 @@ export default function PricingPage() {
             <button
               type="button"
               className={`gp-billtoggle__opt ${annual ? "" : "is-active"}`}
-              onClick={() => setAnnual(false)}
+              onClick={() => {
+                setAnnual(false);
+                posthog.capture("billing_interval_toggled", { interval: "month" });
+              }}
             >
               Monthly
             </button>
             <button
               type="button"
               className={`gp-billtoggle__opt ${annual ? "is-active" : ""}`}
-              onClick={() => setAnnual(true)}
+              onClick={() => {
+                setAnnual(true);
+                posthog.capture("billing_interval_toggled", { interval: "year" });
+              }}
             >
               Annual <span className="gp-billtoggle__save">2 months free</span>
             </button>

@@ -194,6 +194,17 @@ export async function POST(request: Request) {
           currentPeriodStart: period.start,
           currentPeriodEnd: period.end,
         });
+        getPostHogClient().capture({
+          distinctId: userId,
+          event: "subscription_updated",
+          properties: {
+            plan,
+            monthly_credits: monthlyCredits,
+            lookup_key: lookupKey,
+            subscription_id: sub.id,
+            status: sub.status,
+          },
+        });
         break;
       }
 
@@ -269,10 +280,25 @@ export async function POST(request: Request) {
       // Failed renewal: Stripe dunning retries; we keep the plan until it cancels.
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
+        const subId = invoiceSubscriptionId(invoice);
         eventLog.warn("invoice.payment_failed", {
           invoiceId: invoice.id ?? null,
-          subscriptionId: invoiceSubscriptionId(invoice) ?? null,
+          subscriptionId: subId ?? null,
         });
+        const failedSub = subId
+          ? await stripe().subscriptions.retrieve(subId).catch(() => null)
+          : null;
+        const failedUserId = failedSub?.metadata?.userId;
+        if (failedUserId) {
+          getPostHogClient().capture({
+            distinctId: failedUserId,
+            event: "payment_failed",
+            properties: {
+              invoice_id: invoice.id ?? null,
+              subscription_id: subId ?? null,
+            },
+          });
+        }
         // TODO(dunning): notify the user and/or restrict access on terminal failure.
         break;
       }
