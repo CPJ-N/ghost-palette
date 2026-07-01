@@ -7,12 +7,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useCredits } from "@/hooks/use-credits";
-import {
-  CREDIT_PRICE_CENTS,
-  CREDITS_PER_USD,
-  type BillingInterval,
-  type PaidPlan,
-} from "@/lib/stripe/catalog";
+import type { BillingInterval, PaidPlan } from "@/lib/stripe/catalog";
 
 const BASIC_OPTIONS = [
   { credits: 1000, price: 20 },
@@ -110,8 +105,7 @@ export function SettingsBillingContent() {
       {error ? <p className="gp-settings-error">{error}</p> : null}
       <p className="gp-settings-copy">
         Subscriptions grant monthly credits. Annual billing includes two months
-        free. 1 credit = {CREDIT_PRICE_CENTS} cents, so $1 buys{" "}
-        {CREDITS_PER_USD} credits.
+        free.
       </p>
       <p className="gp-settings-copy">
         Current balance:{" "}

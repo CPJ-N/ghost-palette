@@ -8,12 +8,7 @@ import { useState } from "react";
 
 import { MarketingNav } from "@/components/marketing-nav";
 import { SiteFooter } from "@/components/site-footer";
-import {
-  CREDIT_PRICE_CENTS,
-  CREDITS_PER_USD,
-  type BillingInterval,
-  type PaidPlan,
-} from "@/lib/stripe/catalog";
+import type { BillingInterval, PaidPlan } from "@/lib/stripe/catalog";
 
 const BASIC_OPTIONS = [
   { credits: 1000, price: 20 },
@@ -91,10 +86,6 @@ export default function PricingPage() {
           <p>
             Every plan includes Create, Compare, and Refine. Credits are spent
             per generation — pick the volume you need, scale anytime.
-          </p>
-          <p>
-            <strong>1 credit = {CREDIT_PRICE_CENTS} cents.</strong> $1 buys{" "}
-            {CREDITS_PER_USD} credits.
           </p>
           {error ? <p className="gp-pricing__error">{error}</p> : null}
           <div className="gp-billtoggle" role="group" aria-label="Billing period">
