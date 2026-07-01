@@ -36,9 +36,9 @@ export function CookieConsent() {
   return (
     <div className="gp-cookie-banner" role="status" aria-live="polite">
       <p>
-        We use a strictly necessary cookie to keep you signed in. We don&apos;t
-        use advertising or tracking cookies. See our{" "}
-        <Link href="/privacy">Privacy Policy</Link> for details.
+        We only use essential cookies to keep you signed in. No advertising
+        or tracking. See our <Link href="/privacy">Privacy Policy</Link> for
+        details.
       </p>
       <button
         type="button"
