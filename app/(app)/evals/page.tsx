@@ -94,6 +94,8 @@ export default function EvalsPage() {
         : "";
 
     posthog.capture("refine_turn_started", {
+      run_id: sessionRunId,
+      result_id: turnId,
       model_id: modelId,
       tier,
       canvas_influence: canvasInfluence,

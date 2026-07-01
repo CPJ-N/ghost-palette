@@ -71,6 +71,7 @@ export async function POST(request: Request) {
   const mode = body.mode as RunMode;
   const runId = body.runId ?? createId("run");
   const resultId = body.resultId ?? createId("result");
+  const mediaType = model.kind ?? "image";
 
   // Internal models (non-commercial / unreleased) are usable in local dev only —
   // reject them in production even if a client is modified to request one.
@@ -105,6 +106,10 @@ export async function POST(request: Request) {
         event: "insufficient_credits_blocked",
         properties: {
           model_id: model.id,
+          mode,
+          run_id: runId,
+          result_id: resultId,
+          media_type: mediaType,
           credits_required: error.required,
           credits_balance: error.balance,
         },
@@ -183,6 +188,8 @@ export async function POST(request: Request) {
         run_id: runId,
         result_id: resultId,
         mode,
+        media_type: mediaType,
+        prompt_length: prompt.length,
         latency_ms: latencyMs,
         credit_cost: model.creditCost,
         credits_balance: balanceAfterDebit,
@@ -243,6 +250,8 @@ export async function POST(request: Request) {
         run_id: runId,
         result_id: resultId,
         mode,
+        media_type: mediaType,
+        prompt_length: prompt.length,
         latency_ms: failLatencyMs,
         refunded: balanceAfterRefund !== null,
         persisted: errorPersisted,

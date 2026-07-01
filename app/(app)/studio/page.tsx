@@ -139,7 +139,11 @@ function StudioContent() {
       return;
     }
 
+    // Minted before the start event so it can be joined against the
+    // per-image image_generation_completed/failed events fired server-side.
+    const runId = createId("run");
     posthog.capture("image_generation_started", {
+      run_id: runId,
       model_count: selected.length,
       batch_size: batchSize,
       media_type: mediaType,
@@ -153,8 +157,6 @@ function StudioContent() {
     setWinnerId(null);
     setRunError(null);
     setIsGenerating(true);
-
-    const runId = createId("run");
     const createdAt = new Date().toISOString();
     const queued: GenerationResult[] = selected.flatMap((modelId) =>
       Array.from({ length: batchSize }, (_, variantIndex) => ({

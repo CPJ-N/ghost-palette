@@ -14,6 +14,7 @@ import { gradeImageWithVlm } from "@/lib/fal/vision";
 import { runModel } from "@/lib/fal/client";
 import { getChallenge } from "@/lib/imagebench";
 import { MODELS } from "@/lib/models";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 const VLM_JUDGE_CREDIT_COST = 1;
 
@@ -79,6 +80,18 @@ export async function POST(request: Request) {
         modelId,
         requiredCredits: error.required,
         balance: error.balance,
+      });
+      getPostHogClient().capture({
+        distinctId: userId,
+        event: "insufficient_credits_blocked",
+        properties: {
+          model_id: modelId,
+          mode: "benchmark",
+          suite_run_id: suiteRunId,
+          challenge_id: challengeId,
+          credits_required: error.required,
+          credits_balance: error.balance,
+        },
       });
       return NextResponse.json(
         {
@@ -150,6 +163,24 @@ export async function POST(request: Request) {
       totalLatencyMs: durationMs(started),
     });
 
+    getPostHogClient().capture({
+      distinctId: userId,
+      event: "image_generation_completed",
+      properties: {
+        model_id: modelId,
+        mode: "benchmark",
+        run_id: suiteRunId,
+        result_id: resultId,
+        media_type: model.kind ?? "image",
+        challenge_id: challenge.id,
+        category: challenge.category,
+        passed: grade.passed,
+        latency_ms: latencyMs,
+        credit_cost: creditCost,
+        credits_balance: balanceAfterDebit,
+      },
+    });
+
     return NextResponse.json({
       challengeId: challenge.id,
       category: challenge.category,
@@ -183,6 +214,21 @@ export async function POST(request: Request) {
       totalLatencyMs: durationMs(started),
       refunded: balanceAfterRefund !== null,
     });
+
+    getPostHogClient().capture({
+      distinctId: userId,
+      event: "image_generation_failed",
+      properties: {
+        model_id: modelId,
+        mode: "benchmark",
+        run_id: suiteRunId,
+        media_type: model.kind ?? "image",
+        challenge_id: challengeId,
+        latency_ms: durationMs(genStart),
+        refunded: balanceAfterRefund !== null,
+      },
+    });
+
     const message = error instanceof Error ? error.message : "Challenge failed";
     return NextResponse.json(
       {
