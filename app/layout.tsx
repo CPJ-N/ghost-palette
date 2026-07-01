@@ -1,4 +1,5 @@
 import {ClerkProvider} from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 import { CookieConsent } from "@/components/cookie-consent";
@@ -51,6 +52,7 @@ export default function RootLayout({
             <CookieConsent />
           </ClerkProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
