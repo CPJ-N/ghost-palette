@@ -15,8 +15,14 @@ import { runModel } from "@/lib/fal/client";
 import { getChallenge } from "@/lib/imagebench";
 import { MODELS } from "@/lib/models";
 import { getPostHogClient } from "@/lib/posthog-server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const VLM_JUDGE_CREDIT_COST = 1;
+
+// Suites iterate over many challenges in quick succession (UI-driven, not a
+// single click), so this bucket is more generous than /api/generate's.
+const RATE_LIMIT_WINDOW_SECONDS = 60;
+const RATE_LIMIT_MAX_REQUESTS = 60;
 
 export async function POST(request: Request) {
   const started = Date.now();
@@ -26,6 +32,20 @@ export async function POST(request: Request) {
   if (!userId) {
     logUnauthorized(log);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const withinLimit = await checkRateLimit(
+    userId,
+    "benchmark",
+    RATE_LIMIT_WINDOW_SECONDS,
+    RATE_LIMIT_MAX_REQUESTS,
+  );
+  if (!withinLimit) {
+    log.warn("challenge.rate_limited");
+    return NextResponse.json(
+      { error: "Too many requests — slow down and try again shortly." },
+      { status: 429 },
+    );
   }
 
   let body: {

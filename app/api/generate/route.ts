@@ -12,8 +12,16 @@ import {
 import { createId } from "@/lib/domain";
 import { runModel } from "@/lib/fal/client";
 import { isModelAvailable, MODELS } from "@/lib/models";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { persistResult } from "@/lib/runs-db";
 import { RUN_MODES, type RunMode } from "@/lib/types";
+
+// Per-user cap, not a hard product limit — sized to comfortably cover the
+// largest legitimate batch (up to 5 models × 4 variants = 20 requests in one
+// click) with room for a couple of those per minute, while still stopping a
+// scripted loop from hammering the paid provider call below.
+const RATE_LIMIT_WINDOW_SECONDS = 60;
+const RATE_LIMIT_MAX_REQUESTS = 40;
 
 // Generates ONE image. The client fires one request per (model × seed) so each
 // serverless invocation stays short and gives natural per-tile progress.
@@ -27,6 +35,20 @@ export async function POST(request: Request) {
   if (!userId) {
     logUnauthorized(log);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const withinLimit = await checkRateLimit(
+    userId,
+    "generate",
+    RATE_LIMIT_WINDOW_SECONDS,
+    RATE_LIMIT_MAX_REQUESTS,
+  );
+  if (!withinLimit) {
+    log.warn("generate.rate_limited");
+    return NextResponse.json(
+      { error: "Too many requests — slow down and try again shortly." },
+      { status: 429 },
+    );
   }
 
   let body: {

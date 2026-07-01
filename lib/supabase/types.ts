@@ -443,6 +443,16 @@ export type Database = {
         }
         Returns: number
       }
+      check_rate_limit: {
+        Args: {
+          p_bucket: string
+          p_max_requests: number
+          p_user_id: string
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
+      cleanup_rate_limits: { Args: never; Returns: number }
       refresh_due_credits: { Args: never; Returns: number }
       set_credits: {
         Args: {

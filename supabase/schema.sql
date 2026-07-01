@@ -175,6 +175,71 @@ $$;
 revoke all on function refresh_due_credits() from public;
 grant execute on function refresh_due_credits() to service_role;
 
+-- Fixed-window rate limiter for cost-sensitive routes (generation, benchmark).
+-- Built on Postgres rather than an external service (Redis/Upstash) since the
+-- app already has a database connection on every request; one row per
+-- (user_id, bucket, window_start) — a request increments the current window's
+-- counter and the caller checks it against a per-route max.
+create table if not exists rate_limits (
+  user_id      text not null references profiles(user_id) on delete cascade,
+  bucket       text not null,                       -- e.g. "generate", "benchmark"
+  window_start timestamptz not null,
+  count        integer not null default 0,
+  primary key (user_id, bucket, window_start)
+);
+create index if not exists rate_limits_window_idx on rate_limits (window_start);
+
+-- Atomically increments the counter for the current fixed window and returns
+-- whether the request is still within the allowed limit. Windows align to
+-- p_window_seconds boundaries (e.g. every 60s) rather than a sliding log, so
+-- it's one upsert per call — cheap enough to run on every request.
+create or replace function check_rate_limit(
+  p_user_id text,
+  p_bucket text,
+  p_window_seconds integer,
+  p_max_requests integer
+) returns boolean
+language plpgsql
+as $$
+declare
+  v_window_start timestamptz;
+  v_count integer;
+begin
+  v_window_start := to_timestamp(
+    floor(extract(epoch from now()) / p_window_seconds) * p_window_seconds
+  );
+
+  insert into rate_limits (user_id, bucket, window_start, count)
+  values (p_user_id, p_bucket, v_window_start, 1)
+  on conflict (user_id, bucket, window_start)
+    do update set count = rate_limits.count + 1
+  returning count into v_count;
+
+  return v_count <= p_max_requests;
+end;
+$$;
+
+revoke all on function check_rate_limit(text, text, integer, integer) from public;
+grant execute on function check_rate_limit(text, text, integer, integer) to service_role;
+
+-- Bounds table growth. Called from the existing daily cron alongside the
+-- monthly credit refresh — no new schedule needed. A day of headroom is far
+-- more than any window_seconds this app uses, so nothing due is ever deleted.
+create or replace function cleanup_rate_limits() returns integer
+language plpgsql
+as $$
+declare
+  v_count integer;
+begin
+  delete from rate_limits where window_start < now() - interval '1 day';
+  get diagnostics v_count = row_count;
+  return v_count;
+end;
+$$;
+
+revoke all on function cleanup_rate_limits() from public;
+grant execute on function cleanup_rate_limits() to service_role;
+
 -- A generation batch (composer / arena / eval).
 create table if not exists runs (
   id         text primary key,
