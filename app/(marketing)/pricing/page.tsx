@@ -85,7 +85,7 @@ export default function PricingPage() {
           <h1 id="pricing-title">Credit-based pricing</h1>
           <p>
             Every plan includes Create, Compare, and Refine. Credits are spent
-            per generation — pick the volume you need, scale anytime.
+            per generation, so pick the volume you need and scale anytime.
           </p>
           {error ? <p className="gp-pricing__error">{error}</p> : null}
           <div className="gp-billtoggle" role="group" aria-label="Billing period">

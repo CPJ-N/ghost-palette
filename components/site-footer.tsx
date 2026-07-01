@@ -32,12 +32,6 @@ export function SiteFooter() {
             <Link href="/docs/methodology">Methodology</Link>
           </div>
           <div>
-            <p>Studio</p>
-            <Link href="/studio">Create</Link>
-            <Link href="/evals">Refine</Link>
-            <Link href="/gallery">Gallery</Link>
-          </div>
-          <div>
             <p>Account</p>
             <Link href="/sign-in">Sign in</Link>
             <Link href="/sign-up">Create account</Link>
