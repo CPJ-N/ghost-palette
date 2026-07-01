@@ -55,3 +55,4 @@ supabase/.env
 
 # local agent memory / scratch
 .claude/
+.env.local

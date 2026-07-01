@@ -4,6 +4,7 @@ import { useSignIn, useSignUp } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import posthog from "posthog-js";
 import { useState } from "react";
 
 import { AuthBackdrop } from "@/components/auth-backdrop";
@@ -152,6 +153,8 @@ export function AuthForm({ mode }: { mode: Mode }) {
           setError(readClerkError(finalizeError));
           return;
         }
+        posthog.identify(email, { email });
+        posthog.capture("user_signed_in", { method: "email" });
         router.push(afterAuthUrl);
       }
     } catch (err) {
@@ -182,6 +185,8 @@ export function AuthForm({ mode }: { mode: Mode }) {
         setError(readClerkError(finalizeError));
         return;
       }
+      posthog.identify(email, { email });
+      posthog.capture("user_signed_up", { method: "email" });
       router.push(afterAuthUrl);
     } catch (err) {
       setError(readClerkError(err));

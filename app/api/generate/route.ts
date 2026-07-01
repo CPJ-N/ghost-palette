@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { apiLogger, durationMs, logUnauthorized, logValidationError, truncate } from "@/lib/api-log";
+import { getPostHogClient } from "@/lib/posthog-server";
 import {
   ensureProfile,
   grantCredits,
@@ -98,6 +99,16 @@ export async function POST(request: Request) {
         requiredCredits: error.required,
         balance: error.balance,
       });
+      const posthog = getPostHogClient();
+      posthog.capture({
+        distinctId: userId,
+        event: "insufficient_credits_blocked",
+        properties: {
+          model_id: model.id,
+          credits_required: error.required,
+          credits_balance: error.balance,
+        },
+      });
       return NextResponse.json(
         {
           error: "Not enough credits",
@@ -136,13 +147,29 @@ export async function POST(request: Request) {
       kind: model.kind,
     });
 
+    const latencyMs = durationMs(started);
     log.info("generate.success", {
       modelId: model.id,
       seed: result.seed,
-      latencyMs: durationMs(started),
+      latencyMs,
       imageUrlHost: safeHost(result.url),
       creditCost: model.creditCost,
       creditsBalance: balanceAfterDebit,
+    });
+
+    const posthog = getPostHogClient();
+    posthog.capture({
+      distinctId: userId,
+      event: "image_generation_completed",
+      properties: {
+        model_id: model.id,
+        run_id: runId,
+        result_id: resultId,
+        mode,
+        latency_ms: latencyMs,
+        credit_cost: model.creditCost,
+        credits_balance: balanceAfterDebit,
+      },
     });
 
     const { persisted } = await persistResult({
@@ -182,13 +209,27 @@ export async function POST(request: Request) {
       return null;
     });
 
+    const failLatencyMs = durationMs(started);
     log.error("generate.failed", error, {
       modelId: model.id,
       seed: body.seed ?? null,
-      latencyMs: durationMs(started),
+      latencyMs: failLatencyMs,
       refunded: balanceAfterRefund !== null,
     });
     const message = error instanceof Error ? error.message : "Generation failed";
+    const posthogErr = getPostHogClient();
+    posthogErr.capture({
+      distinctId: userId,
+      event: "image_generation_failed",
+      properties: {
+        model_id: model.id,
+        run_id: runId,
+        result_id: resultId,
+        mode,
+        latency_ms: failLatencyMs,
+        refunded: balanceAfterRefund !== null,
+      },
+    });
 
     const { persisted: errorPersisted } = await persistResult({
       runId,

@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { apiLogger, durationMs } from "@/lib/api-log";
 import { deleteProfile, upsertClerkProfile } from "@/lib/credits";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export const runtime = "nodejs";
 
@@ -60,6 +61,14 @@ export async function POST(request: NextRequest) {
           { grantStarter: event.type === "user.created" },
         );
         eventLog.info("clerk_webhook.user_synced", { userId: data.id });
+        getPostHogClient().identify({
+          distinctId: data.id,
+          properties: {
+            email: primary?.email_address ?? null,
+            firstName: data.first_name ?? null,
+            lastName: data.last_name ?? null,
+          },
+        });
         break;
       }
 

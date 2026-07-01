@@ -1,6 +1,7 @@
 "use client";
 
 import { Heart } from "lucide-react";
+import posthog from "posthog-js";
 import { useState } from "react";
 
 type FavoriteToggleProps = {
@@ -24,6 +25,7 @@ export function FavoriteToggle({ resultId, favorite, className, onChange }: Favo
     const next = !favorite;
     setBusy(true);
     onChange(resultId, next);
+    posthog.capture("image_favorited", { result_id: resultId, favorited: next });
     try {
       const response = await fetch(`/api/results/${resultId}`, {
         method: "PATCH",

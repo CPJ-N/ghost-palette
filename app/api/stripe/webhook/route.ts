@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
 import { apiLogger, durationMs } from "@/lib/api-log";
+import { getPostHogClient } from "@/lib/posthog-server";
 import {
   ensureProfile,
   isDuplicateGrant,
@@ -156,6 +157,15 @@ export async function POST(request: Request) {
         if (monthlyCredits > 0 && subId) {
           await resetSubscriptionCreditsOnce(eventLog, userId, monthlyCredits, subId);
         }
+        getPostHogClient().capture({
+          distinctId: userId,
+          event: "subscription_purchased",
+          properties: {
+            plan,
+            monthly_credits: monthlyCredits,
+            subscription_id: subId ?? null,
+          },
+        });
         break;
       }
 
@@ -203,6 +213,11 @@ export async function POST(request: Request) {
           currentPeriodStart: null,
           currentPeriodEnd: null,
         });
+        getPostHogClient().capture({
+          distinctId: userId,
+          event: "subscription_cancelled",
+          properties: { subscription_id: sub.id },
+        });
         break;
       }
 
@@ -236,6 +251,17 @@ export async function POST(request: Request) {
           monthlyCredits,
           currentPeriodStart: period.start,
           currentPeriodEnd: period.end,
+        });
+        getPostHogClient().capture({
+          distinctId: userId,
+          event: "subscription_renewed",
+          properties: {
+            plan,
+            monthly_credits: monthlyCredits,
+            subscription_id: subId,
+            period_start: period.start,
+            period_end: period.end,
+          },
         });
         break;
       }

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import posthog from "posthog-js";
 import { Suspense, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -138,6 +139,14 @@ function StudioContent() {
       return;
     }
 
+    posthog.capture("image_generation_started", {
+      model_count: selected.length,
+      batch_size: batchSize,
+      media_type: mediaType,
+      total_images: selected.length * batchSize,
+      credit_cost: selectedCost,
+    });
+
     // Immediate feedback: flip to generating + show the rendering grid BEFORE any
     // network call, so pressing Enter / the arrow visibly registers at once.
     // The server re-checks credits per image and refunds on failure.
@@ -217,6 +226,12 @@ function StudioContent() {
 
   async function pickWinner(result: GenerationResult) {
     setWinnerId(result.id);
+    posthog.capture("winner_picked", {
+      model_id: result.modelId,
+      run_id: result.runId,
+      result_id: result.id,
+      model_count: results.length,
+    });
     try {
       const response = await fetch(`/api/runs/${result.runId}`, {
         method: "PATCH",

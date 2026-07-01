@@ -3,6 +3,7 @@
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import posthog from "posthog-js";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,12 @@ export function SettingsBillingContent() {
       return;
     }
 
+    posthog.capture("checkout_started", {
+      plan,
+      credits,
+      interval,
+      lookup_key: key,
+    });
     setBusy(key);
     setError(null);
     try {
@@ -148,14 +155,14 @@ export function SettingsBillingContent() {
         <button
           type="button"
           className={`gp-billtoggle__opt ${annual ? "" : "is-active"}`}
-          onClick={() => setAnnual(false)}
+          onClick={() => { setAnnual(false); posthog.capture("billing_interval_toggled", { interval: "month" }); }}
         >
           Monthly
         </button>
         <button
           type="button"
           className={`gp-billtoggle__opt ${annual ? "is-active" : ""}`}
-          onClick={() => setAnnual(true)}
+          onClick={() => { setAnnual(true); posthog.capture("billing_interval_toggled", { interval: "year" }); }}
         >
           Annual
         </button>
