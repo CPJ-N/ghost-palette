@@ -7,6 +7,13 @@ export const metadata: Metadata = {
   title: "Docs — Ghost Palette",
   description:
     "Documentation for Ghost Palette — image generation workflows, model scores, benchmarks, and evaluation methodology.",
+  alternates: { canonical: "/docs" },
+  openGraph: {
+    url: "/docs",
+    title: "Docs — Ghost Palette",
+    description:
+      "Documentation for Ghost Palette — image generation workflows, model scores, benchmarks, and evaluation methodology.",
+  },
 };
 
 const SECTIONS = [

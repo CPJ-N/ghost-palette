@@ -22,10 +22,46 @@ const nunitoSans = Nunito_Sans({
   weight: "900",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://ghostpalette.app";
+const SITE_DESCRIPTION =
+  "Generate AI images and video side by side across FLUX, Stable Diffusion, Recraft, Seedream, Ideogram, Kling, Luma and more — one prompt, every model, compared in the same light.";
+
 export const metadata: Metadata = {
-  title: "Ghost Palette",
-  description:
-    "The model-smart image studio for generating, comparing, refining, and saving AI images.",
+  metadataBase: new URL(SITE_URL),
+  title: "Ghost Palette — Compare AI Image & Video Models Side by Side",
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+  keywords: [
+    "AI image generator",
+    "AI video generator",
+    "compare AI models",
+    "FLUX",
+    "Stable Diffusion",
+    "Recraft",
+    "Seedream",
+    "Ideogram",
+    "Kling",
+    "Luma Dream Machine",
+    "text to image",
+    "text to video",
+  ],
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "Ghost Palette",
+    title: "Ghost Palette — Compare AI Image & Video Models Side by Side",
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ghost Palette — Compare AI Image & Video Models Side by Side",
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
 };
 
 export default function RootLayout({

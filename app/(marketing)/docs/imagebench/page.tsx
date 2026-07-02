@@ -16,6 +16,13 @@ export const metadata: Metadata = {
   title: "ImageBench V1 Reference — Ghost Palette Docs",
   description:
     "ImageBench V1 methodology, 192-prompt suite structure, VLM routing, and published leaderboard copied from imagebench.ai.",
+  alternates: { canonical: "/docs/imagebench" },
+  openGraph: {
+    url: "/docs/imagebench",
+    title: "ImageBench V1 Reference — Ghost Palette Docs",
+    description:
+      "ImageBench V1 methodology, 192-prompt suite structure, VLM routing, and published leaderboard copied from imagebench.ai.",
+  },
 };
 
 export default function ImageBenchDocsPage() {

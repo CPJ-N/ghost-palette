@@ -81,11 +81,31 @@ const GALLERY: { src: string; label: string }[] = [
   { src: "/samples/landing/gallery-8.jpg", label: "FLUX.2" },
 ];
 
+const STRUCTURED_DATA = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Ghost Palette",
+  url: "https://ghostpalette.app",
+  description:
+    "Generate AI images and video side by side across FLUX, Stable Diffusion, Recraft, Seedream, Ideogram, Kling, Luma and more — one prompt, every model, compared in the same light.",
+  applicationCategory: "DesignApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+};
+
 export default function MarketingPage() {
   const reelCount = REEL.length;
 
   return (
     <main className={styles.page}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
+      />
       <MarketingNav
         homeAnchors={[
           { href: "#how", label: "How it works" },

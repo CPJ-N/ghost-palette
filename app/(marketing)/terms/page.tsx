@@ -6,6 +6,12 @@ import { SiteFooter } from "@/components/site-footer";
 export const metadata: Metadata = {
   title: "Terms of Service — Ghost Palette",
   description: "The terms that govern your use of Ghost Palette.",
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    url: "/terms",
+    title: "Terms of Service — Ghost Palette",
+    description: "The terms that govern your use of Ghost Palette.",
+  },
 };
 
 const LAST_UPDATED = "June 30, 2026";

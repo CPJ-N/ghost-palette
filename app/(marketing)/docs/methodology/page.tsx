@@ -9,6 +9,13 @@ export const metadata: Metadata = {
   title: "Evaluation Methodology — Ghost Palette Docs",
   description:
     "How Ghost Palette runs fair image model comparisons — Create and Refine workflows aligned with industry benchmark practices.",
+  alternates: { canonical: "/docs/methodology" },
+  openGraph: {
+    url: "/docs/methodology",
+    title: "Evaluation Methodology — Ghost Palette Docs",
+    description:
+      "How Ghost Palette runs fair image model comparisons — Create and Refine workflows aligned with industry benchmark practices.",
+  },
 };
 
 const FAIR_RUN_RULES = [

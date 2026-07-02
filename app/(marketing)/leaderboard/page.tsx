@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   title: "Live Image Model Leaderboard — Ghost Palette",
   description:
     "GP-reproduced ImageBench V1 pass rates — latest VLM-graded result per challenge from suite runs on Ghost Palette.",
+  alternates: { canonical: "/leaderboard" },
+  openGraph: {
+    url: "/leaderboard",
+    title: "Live Image Model Leaderboard — Ghost Palette",
+    description:
+      "GP-reproduced ImageBench V1 pass rates — latest VLM-graded result per challenge from suite runs on Ghost Palette.",
+  },
 };
 
 function modelLabel(modelId: string) {

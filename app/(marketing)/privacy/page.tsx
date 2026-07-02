@@ -6,6 +6,12 @@ import { SiteFooter } from "@/components/site-footer";
 export const metadata: Metadata = {
   title: "Privacy Policy — Ghost Palette",
   description: "How Ghost Palette collects, uses, and protects your information.",
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    url: "/privacy",
+    title: "Privacy Policy — Ghost Palette",
+    description: "How Ghost Palette collects, uses, and protects your information.",
+  },
 };
 
 const LAST_UPDATED = "June 30, 2026";

@@ -10,6 +10,13 @@ export const metadata: Metadata = {
   title: "Industry Image Model Benchmarks — Ghost Palette Docs",
   description:
     "Curated external rankings: Arena Elo, published ImageBench pass rates, GenEval, speed, and price from public sources.",
+  alternates: { canonical: "/docs/benchmarks" },
+  openGraph: {
+    url: "/docs/benchmarks",
+    title: "Industry Image Model Benchmarks — Ghost Palette Docs",
+    description:
+      "Curated external rankings: Arena Elo, published ImageBench pass rates, GenEval, speed, and price from public sources.",
+  },
 };
 
 export default function BenchmarksDocsPage() {
